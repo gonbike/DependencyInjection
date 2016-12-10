@@ -109,7 +109,7 @@ namespace AspectCore.Lite.Container.DependencyInjection
             return true;
         }
 
-        public static bool CanProxy(TypeInfo typeInfo, IAspectValidator aspectValidator)
+        private static bool CanProxy(TypeInfo typeInfo, IAspectValidator aspectValidator)
         {
             if (typeInfo.IsValueType)
             {
