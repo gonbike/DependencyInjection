@@ -1,47 +1,37 @@
 ﻿using AspectCore.Lite.Abstractions;
-using AspectCore.Lite.DynamicProxy.Container;
+using AspectCore.Lite.Abstractions.Resolution;
 using Autofac;
 using Autofac.Builder;
 using Autofac.Core;
-using Autofac.Features.Scanning;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
-using AutofacDef = Autofac.Builder;
+using System.Threading;
+using AutofacRegistrationBuilder = Autofac.Builder.RegistrationBuilder;
 
 namespace AspectCore.Lite.Container.Autofac
 {
     public static class RegistrationExtensions
     {
-        private static readonly AspectServiceProvider aspectServiceProvider = new AspectServiceProvider();
-        internal static void RegisterAspectCoreLite(this ContainerBuilder builder, Action<IInterceptorTable> configure = null)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-            var serviceDescriptions = ContainerHelper.GetAspectServiceDescriptions();
-            foreach (var description in serviceDescriptions)
-                builder.RegisterType(description.ImplementationType).As(description.ServiceType).ConfigureLifecycle(description.Lifetime);
-            if (configure != null)
-            {
-                var interceptorCollection = ContainerHelper.GetInterceptorTable();
-                configure(interceptorCollection);
-                builder.RegisterInstance(interceptorCollection).SingleInstance();
-            }
-        }
+        private static readonly Lazy<IInterceptorConfiguration> InterceptorConfiguration = new Lazy<IInterceptorConfiguration>(() => new InterceptorConfiguration(), LazyThreadSafetyMode.ExecutionAndPublication);
 
-        public static void RegisterInterceptor(this ContainerBuilder builder, Action<IInterceptorTable> configure)
+        public static void ConfiguringInterceptors(this ContainerBuilder builder, Action<IInterceptorConfiguration> configure = null)
         {
             if (builder == null)
             {
                 throw new ArgumentNullException(nameof(builder));
             }
-            if (configure == null)
-            {
-                throw new ArgumentNullException(nameof(configure));
-            }
-            var interceptorCollection = (IInterceptorTable)aspectServiceProvider.GetService(typeof(IInterceptorTable));
-            configure(interceptorCollection);
+
+            builder.RegisterType<AspectActivator>().As<IAspectActivator>().InstancePerDependency();
+            builder.RegisterType<AspectBuilder>().As<IAspectBuilder>().InstancePerDependency();
+            builder.RegisterType<DynamicProxyServiceProvider>().As<IServiceProvider>().InstancePerDependency();
+
+            builder.RegisterType<InterceptorInjector>().As<IInterceptorInjector>().InstancePerLifetimeScope();
+            builder.RegisterType<AspectValidator>().As<IAspectValidator>().SingleInstance();
+            builder.RegisterType<InterceptorMatcher>().As<IInterceptorMatcher>().SingleInstance();
+
+            configure?.Invoke(InterceptorConfiguration.Value);
+            builder.Register<IInterceptorConfiguration>(ctx => InterceptorConfiguration.Value).SingleInstance();
         }
 
         public static IRegistrationBuilder<TImplementer, ServiceConcreteReflectionActivatorData, SingleRegistrationStyle> RegisterDynamicProxy<TImplementer>(this ContainerBuilder builder)
@@ -55,7 +45,7 @@ namespace AspectCore.Lite.Container.Autofac
 
             var registration = RegistrationBuilder.ForDynamicProxy<TService, TImplementer>();
 
-            builder.RegisterCallback(cr => AutofacDef.RegistrationBuilder.RegisterSingleComponent(cr, registration));
+            builder.RegisterCallback(cr => AutofacRegistrationBuilder.RegisterSingleComponent(cr, registration));
 
             return registration.RegisterRuntimeProxy();
         }
@@ -82,7 +72,7 @@ namespace AspectCore.Lite.Container.Autofac
 
             var registration = RegistrationBuilder.ForDynamicProxy(serviceType, implementationType);
 
-            builder.RegisterCallback(cr => AutofacDef.RegistrationBuilder.RegisterSingleComponent(cr, registration));
+            builder.RegisterCallback(cr => AutofacRegistrationBuilder.RegisterSingleComponent(cr, registration));
 
             return registration.RegisterRuntimeProxy();
         }
@@ -94,79 +84,40 @@ namespace AspectCore.Lite.Container.Autofac
                 throw new ArgumentNullException(nameof(registration));
             }
 
-            var aspectValidator = (IAspectValidator)aspectServiceProvider.GetService(typeof(IAspectValidator));
+            var aspectValidator = new AspectValidator(InterceptorConfiguration.Value);
 
-            if(!CanProxy(registration.ActivatorData.ServiceType, registration.ActivatorData.ImplementationType, aspectValidator))
-            {
-                return registration; 
-            }
+            Validate(registration.ActivatorData.ServiceType, registration.ActivatorData.ImplementationType, aspectValidator);
 
             var activator = registration.ActivatorData.Activator;
-            registration.ActivatorData.ImplementationType = ContainerHelper.CreateAspectType(registration.ActivatorData.ServiceType, registration.ActivatorData.ImplementationType, aspectServiceProvider);
+            registration.ActivatorData.ImplementationType = registration.ActivatorData.ServiceType.CreateProxyType(registration.ActivatorData.ImplementationType, aspectValidator);
 
             registration.OnPreparing(args =>
             {
                 var parameters = args.Parameters.ToList();
-                var targetProvider = new AutofacTargetServiceProvider(activator.ActivateInstance(args.Context, parameters));
-                parameters.Add(new PositionalParameter(parameters.Count, aspectServiceProvider));
-                parameters.Add(new PositionalParameter(parameters.Count, targetProvider));
+                var supportOriginalService = new SupportOriginalService(activator.ActivateInstance(args.Context, parameters));
+                parameters.Add(new ResolvedParameter((p, ctx) => p.ParameterType == typeof(IServiceProvider), (p, ctx) =>
+                  {
+                      return ctx.Resolve(p.ParameterType);
+                  }));
+                parameters.Add(new PositionalParameter(parameters.Count, supportOriginalService));
                 args.Parameters = parameters;
             });
 
             return registration;
         }
 
-        private static bool CanProxy(Type serviceType, Type implementationType, IAspectValidator aspectValidator)
+        private static void Validate(Type serviceType, Type implementationType, IAspectValidator aspectValidator)
         {
 
-            if (!CanProxy(serviceType.GetTypeInfo(), aspectValidator))
+            if (!serviceType.GetTypeInfo().ValidateAspect(aspectValidator))
             {
-                return false;
+                throw new InvalidOperationException($"Register dynamicProxy failed.Service {serviceType.FullName} cannot be validated.");
             }
 
-            if (!CanInherited(implementationType.GetTypeInfo()))
+            if (!implementationType.GetTypeInfo().CanInherited())
             {
-                return false;
+                throw new InvalidOperationException($"Register dynamicProxy failed.Type {implementationType.FullName} cannot be inherited.");
             }
-
-            return true;
         }
-
-        private static bool CanProxy(TypeInfo typeInfo, IAspectValidator aspectValidator)
-        {
-            if (typeInfo.IsValueType)
-            {
-                return false;
-            }
-
-            return typeInfo.DeclaredMethods.Any(method => aspectValidator.Validate(method));
-        }
-
-        private static bool CanInherited(TypeInfo typeInfo)
-        {
-            return typeInfo.IsClass && (typeInfo.IsPublic || (typeInfo.IsNested && typeInfo.IsNestedPublic)) &&
-                   !typeInfo.IsSealed && !typeInfo.IsGenericTypeDefinition;
-        }
-
-        private static IRegistrationBuilder<object, TActivatorData, TRegistrationStyle> ConfigureLifecycle<TActivatorData, TRegistrationStyle>(
-               this IRegistrationBuilder<object, TActivatorData, TRegistrationStyle> registrationBuilder,
-               Lifetime lifecycleKind)
-        {
-            switch (lifecycleKind)
-            {
-                case Lifetime.Singleton:
-                    registrationBuilder.SingleInstance();
-                    break;
-                case Lifetime.Scoped:
-                    registrationBuilder.InstancePerLifetimeScope();
-                    break;
-                case Lifetime.Transient:
-                    registrationBuilder.InstancePerDependency();
-                    break;
-            }
-
-            return registrationBuilder;
-        }
-
     }
 }

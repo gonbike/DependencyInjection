@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace AspectCore.Lite.Container.Autofac
@@ -237,7 +238,11 @@ namespace AspectCore.Lite.Container.Autofac
         /// <returns>A registration builder allowing further configuration of the component.</returns>
         public IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> As(params Service[] services)
         {
-            throw new NotImplementedException();
+            if (services == null) throw new ArgumentNullException(nameof(services));
+
+            RegistrationData.AddServices(services);
+
+            return this;
         }
 
         /// <summary>
@@ -389,7 +394,12 @@ namespace AspectCore.Lite.Container.Autofac
         /// <returns>A registration builder allowing further configuration of the component.</returns>
         public IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> WithMetadata<TMetadata>(Action<MetadataConfiguration<TMetadata>> configurationAction)
         {
-            throw new NotImplementedException();
+            if (configurationAction == null) throw new ArgumentNullException(nameof(configurationAction));
+
+            var epConfiguration = new MetadataConfiguration<TMetadata>();
+            configurationAction(epConfiguration);
+            var properties = Expression.Lambda<Func<IEnumerable<KeyValuePair<string, object>>>>(Expression.Property(Expression.Constant(epConfiguration), "Properties")).Compile()();
+            return WithMetadata(properties);
         }
     }
 }

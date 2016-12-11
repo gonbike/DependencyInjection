@@ -1,13 +1,13 @@
-﻿using AspectCore.Lite.DynamicProxy;
+﻿using AspectCore.Lite.Abstractions.Resolution;
 using System;
 
 namespace AspectCore.Lite.Container.Autofac
 {
-    internal class AutofacTargetServiceProvider : ITargetServiceProvider
+    internal class SupportOriginalService : ISupportOriginalService
     {
         private readonly object instance;
 
-        public AutofacTargetServiceProvider(object instance)
+        public SupportOriginalService(object instance)
         {
             this.instance = instance;
         }
@@ -15,7 +15,7 @@ namespace AspectCore.Lite.Container.Autofac
         {
         }
 
-        public object GetTarget(Type serviceType)
+        public object GetService(Type serviceType)
         {
             return instance;
         }

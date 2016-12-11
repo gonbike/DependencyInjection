@@ -12,15 +12,7 @@ namespace AspectCore.Lite.Container.Autofac
     {
         public Type ServiceType { get; }
 
-        //IInstanceActivator IConcreteActivatorData.Activator
-        //{
-        //    get
-        //    {
-        //        return new DelegateActivator(ImplementationType, (ctx, paramters) => Activator.ActivateInstance(ctx, paramters));
-        //    }
-        //}
-
-        public ServiceConcreteReflectionActivatorData(Type serviceType, Type implementer):base(implementer)
+        public ServiceConcreteReflectionActivatorData(Type serviceType, Type implementer) : base(implementer)
         {
             this.ServiceType = serviceType;
         }
