@@ -3,11 +3,13 @@ using AspectCore.Lite.Abstractions.Resolution;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
+using System.Threading;
 
 namespace AspectCore.Lite.Container.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
+        private static readonly Lazy<IInterceptorConfiguration> InterceptorConfiguration = new Lazy<IInterceptorConfiguration>(() => new InterceptorConfiguration(), LazyThreadSafetyMode.ExecutionAndPublication);
         public static IServiceCollection TryAddAspectCoreLite(this IServiceCollection services)
         {
             if (services == null)
@@ -20,7 +22,7 @@ namespace AspectCore.Lite.Container.DependencyInjection
             services.TryAddScoped<IInterceptorInjector, InterceptorInjector>();
             services.TryAddSingleton<IAspectValidator, AspectValidator>();
             services.TryAddSingleton<IInterceptorMatcher, InterceptorMatcher>();
-            services.TryAddSingleton<IInterceptorConfiguration, InterceptorConfiguration>();
+            services.TryAddSingleton<IInterceptorConfiguration>(p => InterceptorConfiguration.Value);
 
             return services;
         }
@@ -36,10 +38,9 @@ namespace AspectCore.Lite.Container.DependencyInjection
                 throw new ArgumentNullException(nameof(configure));
             }
 
-            var configuration = new InterceptorConfiguration();
-            configure.Invoke(configuration);
-
-            return services.AddSingleton(configuration);
-        }   
+            configure.Invoke(InterceptorConfiguration.Value);
+            services.TryAddSingleton<IInterceptorConfiguration>(p => InterceptorConfiguration.Value);
+            return services;
+        }
     }
 }
