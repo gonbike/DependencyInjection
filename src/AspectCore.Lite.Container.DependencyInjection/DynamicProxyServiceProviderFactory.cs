@@ -42,7 +42,7 @@ namespace AspectCore.Lite.Container.DependencyInjection
             return CreateBuilder(containerBuilder).BuildServiceProvider();
         }
 
-        public IServiceProvider Create(IServiceCollection services)
+        public static IServiceProvider Create(IServiceCollection services)
         {
             return new DynamicProxyServiceProviderFactory().CreateServiceProvider(services);
         }
