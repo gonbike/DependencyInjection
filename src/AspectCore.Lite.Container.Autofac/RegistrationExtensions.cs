@@ -13,9 +13,9 @@ namespace AspectCore.Lite.Container.Autofac
 {
     public static class RegistrationExtensions
     {
-        private static readonly Lazy<IInterceptorConfiguration> InterceptorConfiguration = new Lazy<IInterceptorConfiguration>(() => new InterceptorConfiguration(), LazyThreadSafetyMode.ExecutionAndPublication);
+        private static readonly Lazy<IAspectConfigurator> AspectConfiguration = new Lazy<IAspectConfigurator>(() => new AspectConfigurator(), LazyThreadSafetyMode.ExecutionAndPublication);
 
-        public static void ConfiguringInterceptors(this ContainerBuilder builder, Action<IInterceptorConfiguration> configure = null)
+        public static void ConfiguringAspect(this ContainerBuilder builder, Action<IAspectConfigurator> configure = null)
         {
             if (builder == null)
             {
@@ -30,8 +30,8 @@ namespace AspectCore.Lite.Container.Autofac
             builder.RegisterType<AspectValidator>().As<IAspectValidator>().SingleInstance();
             builder.RegisterType<InterceptorMatcher>().As<IInterceptorMatcher>().SingleInstance();
 
-            configure?.Invoke(InterceptorConfiguration.Value);
-            builder.Register<IInterceptorConfiguration>(ctx => InterceptorConfiguration.Value).SingleInstance();
+            configure?.Invoke(AspectConfiguration.Value);
+            builder.Register<IAspectConfigurator>(ctx => AspectConfiguration.Value).SingleInstance();
         }
 
         public static IRegistrationBuilder<TImplementer, ServiceConcreteReflectionActivatorData, SingleRegistrationStyle> RegisterDynamicProxy<TImplementer>(this ContainerBuilder builder)
@@ -84,7 +84,7 @@ namespace AspectCore.Lite.Container.Autofac
                 throw new ArgumentNullException(nameof(registration));
             }
 
-            var aspectValidator = new AspectValidator(InterceptorConfiguration.Value);
+            var aspectValidator = new AspectValidator(AspectConfiguration.Value);
 
             Validate(registration.ActivatorData.ServiceType, registration.ActivatorData.ImplementationType, aspectValidator);
 
