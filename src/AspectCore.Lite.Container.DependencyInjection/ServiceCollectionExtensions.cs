@@ -27,7 +27,7 @@ namespace AspectCore.Lite.Container.DependencyInjection
             return services;
         }
 
-        public static IServiceCollection AddInterceptorConfiguration(this IServiceCollection services, Action<IAspectConfigurator> configure)
+        public static IServiceCollection AddAspectConfiguration(this IServiceCollection services, Action<IAspectConfigurator> configure)
         {
             if (services == null)
             {
