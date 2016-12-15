@@ -1,8 +1,8 @@
-﻿{
+{
   "authors": [ "liuhaoyang" ],
   "dependencies": {
     "Autofac": "4.0.1",
-    "AspectCore.Lite.Abstractions.Resolution": "1.0.0-beta5-12150"
+    "AspectCore.Lite.Abstractions.Resolution": "1.0.0-beta5-12152"
   },
   "description": "Interceptor and dynamicProxy support for Autofac via AspectCore Lite",
   "frameworks": {
