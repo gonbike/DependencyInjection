@@ -13,7 +13,8 @@ namespace AspectCore.Lite.Container.Autofac
 {
     public static class RegistrationExtensions
     {
-        private static readonly Lazy<IAspectConfigurator> AspectConfiguration = new Lazy<IAspectConfigurator>(() => new AspectConfigurator(), LazyThreadSafetyMode.ExecutionAndPublication);
+        //private static readonly Lazy<IAspectConfigurator> AspectConfiguration = new Lazy<IAspectConfigurator>(() => new AspectConfigurator(), LazyThreadSafetyMode.ExecutionAndPublication);
+        private static readonly IAspectConfiguratorFactory<ContainerBuilder> aspectConfiguratorFactory = new AspectConfiguratorFactory();
 
         public static void ConfiguringAspect(this ContainerBuilder builder, Action<IAspectConfigurator> configure = null)
         {
@@ -30,8 +31,9 @@ namespace AspectCore.Lite.Container.Autofac
             builder.RegisterType<AspectValidator>().As<IAspectValidator>().SingleInstance();
             builder.RegisterType<InterceptorMatcher>().As<IInterceptorMatcher>().SingleInstance();
 
-            configure?.Invoke(AspectConfiguration.Value);
-            builder.Register<IAspectConfigurator>(ctx => AspectConfiguration.Value).SingleInstance();
+            var aspectConfigurator = aspectConfiguratorFactory.CreateConfigurator(builder);
+            configure?.Invoke(aspectConfigurator);
+            builder.RegisterInstance<IAspectConfigurator>(aspectConfigurator).SingleInstance();
         }
 
         public static IRegistrationBuilder<TImplementer, ServiceConcreteReflectionActivatorData, SingleRegistrationStyle> RegisterDynamicProxy<TImplementer>(this ContainerBuilder builder)
@@ -47,7 +49,7 @@ namespace AspectCore.Lite.Container.Autofac
 
             builder.RegisterCallback(cr => AutofacRegistrationBuilder.RegisterSingleComponent(cr, registration));
 
-            return registration.RegisterRuntimeProxy();
+            return RegisterRuntimeProxy(builder, registration);
         }
 
         public static IRegistrationBuilder<object, ServiceConcreteReflectionActivatorData, SingleRegistrationStyle> RegisterDynamicProxy(this ContainerBuilder builder, Type serviceType)
@@ -74,17 +76,17 @@ namespace AspectCore.Lite.Container.Autofac
 
             builder.RegisterCallback(cr => AutofacRegistrationBuilder.RegisterSingleComponent(cr, registration));
 
-            return registration.RegisterRuntimeProxy();
+            return RegisterRuntimeProxy(builder, registration);
         }
 
-        private static IRegistrationBuilder<TLimit, ServiceConcreteReflectionActivatorData, TRegistrationStyle> RegisterRuntimeProxy<TLimit, TRegistrationStyle>(this IRegistrationBuilder<TLimit, ServiceConcreteReflectionActivatorData, TRegistrationStyle> registration)
+        private static IRegistrationBuilder<TLimit, ServiceConcreteReflectionActivatorData, TRegistrationStyle> RegisterRuntimeProxy<TLimit, TRegistrationStyle>(ContainerBuilder builder, IRegistrationBuilder<TLimit, ServiceConcreteReflectionActivatorData, TRegistrationStyle> registration)
         {
             if (registration == null)
             {
                 throw new ArgumentNullException(nameof(registration));
             }
 
-            var aspectValidator = new AspectValidator(AspectConfiguration.Value);
+            var aspectValidator = new AspectValidator(aspectConfiguratorFactory.CreateConfigurator(builder));
 
             Validate(registration.ActivatorData.ServiceType, registration.ActivatorData.ImplementationType, aspectValidator);
 

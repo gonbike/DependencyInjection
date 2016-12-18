@@ -2,7 +2,7 @@
   "authors": [ "liuhaoyang" ],
   "dependencies": {
     "Microsoft.Extensions.DependencyInjection": "1.1.0",
-    "AspectCore.Lite.Abstractions.Resolution": "1.0.0-beta5-12152"
+    "AspectCore.Lite.Abstractions.Resolution": "1.0.0-beta5-12160"
   },
   "description": "Interceptor and dynamicProxy support for Microsoft.Extensions.DependencyInjection via AspectCore Lite",
   "frameworks": {
@@ -32,5 +32,5 @@
   },
   "projectUrl": "https://github.com/AspectCore/Lite.Container",
   "title": "AspectCore.Lite.Container.DependencyInjection",
-  "version": "1.0.0-beta5-12152"
+  "version": "1.0.0-beta5-12160"
 }
