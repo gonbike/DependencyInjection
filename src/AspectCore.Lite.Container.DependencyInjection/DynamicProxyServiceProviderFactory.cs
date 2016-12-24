@@ -42,11 +42,6 @@ namespace AspectCore.Lite.Container.DependencyInjection
             return CreateBuilder(containerBuilder).BuildServiceProvider();
         }
 
-        public static IServiceProvider Create(IServiceCollection services)
-        {
-            return new DynamicProxyServiceProviderFactory().CreateServiceProvider(services);
-        }
-
         private static bool Validate(ServiceDescriptor serviceDescriptor, IAspectValidator aspectValidator)
         {
             var implementationType = serviceDescriptor.ImplementationType;
