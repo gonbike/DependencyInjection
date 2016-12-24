@@ -3,7 +3,7 @@ using System;
 
 namespace AspectCore.Lite.Container.Autofac
 {
-    public class DynamicProxyServiceProvider : IServiceProvider
+    internal class DynamicProxyServiceProvider : IServiceProvider
     {
         private readonly IComponentContext componentContext;
 
