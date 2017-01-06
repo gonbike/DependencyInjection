@@ -1,5 +1,6 @@
 ﻿using AspectCore.Lite.Abstractions;
 using AspectCore.Lite.Abstractions.Resolution;
+using AspectCore.Lite.Abstractions.Resolution.Common;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
@@ -7,24 +8,26 @@ using System.Reflection;
 
 namespace AspectCore.Lite.Container.DependencyInjection
 {
-    public class DynamicProxyServiceProviderFactory : IServiceProviderFactory<IServiceCollection>
+    public class AspectCoreServiceProviderFactory : IServiceProviderFactory<IServiceCollection>
     {
-        public IServiceCollection CreateBuilder(IServiceCollection services)
+        public IServiceCollection CreateBuilder(IServiceCollection serviceCollection)
         {
-            var serviceProvider = services.TryAddAspectCoreLite().BuildServiceProvider();
+            var serviceProvider = serviceCollection.TryAddAspectCoreLite().BuildServiceProvider();
 
             var aspectValidator = serviceProvider.GetRequiredService<IAspectValidator>();
 
             var dynamicProxyServices = new ServiceCollection();
 
-            foreach (var descriptor in services)
+            var generator = new TypeGeneratorWrapper();
+
+            foreach (var descriptor in serviceCollection)
             {
                 if (!Validate(descriptor, aspectValidator))
                 {
                     dynamicProxyServices.Add(descriptor);
                     continue;
                 }
-                var proxyType = descriptor.ServiceType.CreateProxyType(descriptor.ImplementationType, aspectValidator);
+                var proxyType = generator.CreateType(descriptor.ServiceType, descriptor.ImplementationType, aspectValidator);
                 dynamicProxyServices.Add(ServiceDescriptor.Describe(descriptor.ServiceType, proxyType, descriptor.Lifetime));
             }
 

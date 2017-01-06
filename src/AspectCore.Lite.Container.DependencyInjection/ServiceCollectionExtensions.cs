@@ -8,7 +8,7 @@ namespace AspectCore.Lite.Container.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection TryAddAspectCoreLite(this IServiceCollection services)
+        internal static IServiceCollection TryAddAspectCoreLite(this IServiceCollection services)
         {
             if (services == null)
             {
@@ -19,11 +19,11 @@ namespace AspectCore.Lite.Container.DependencyInjection
             services.TryAddScoped<IInterceptorInjector, InterceptorInjector>();
             services.TryAddSingleton<IAspectValidator, AspectValidator>();
             services.TryAddSingleton<IInterceptorMatcher, InterceptorMatcher>();
-            services.TryAddSingleton<IAspectConfigurator>(new AspectConfigurator());
+            services.TryAddSingleton<IAspectConfiguration>(new AspectConfiguration());
             return services;
         }
 
-        public static IServiceCollection AddAspectConfiguration(this IServiceCollection services, Action<IAspectConfigurator> configure)
+        public static IServiceCollection AddAspectConfiguration(this IServiceCollection services, Action<IAspectConfiguration> configure)
         {
             if (services == null)
             {
@@ -33,9 +33,9 @@ namespace AspectCore.Lite.Container.DependencyInjection
             {
                 throw new ArgumentNullException(nameof(configure));
             }
-            var aspectConfigurator = new AspectConfigurator();
-            configure.Invoke(aspectConfigurator);
-            services.TryAddSingleton<IAspectConfigurator>(aspectConfigurator);
+            var aspectConfiguration = new AspectConfiguration();
+            configure.Invoke(aspectConfiguration);
+            services.TryAddSingleton<IAspectConfiguration>(aspectConfiguration);
             return services;
         }
     }
