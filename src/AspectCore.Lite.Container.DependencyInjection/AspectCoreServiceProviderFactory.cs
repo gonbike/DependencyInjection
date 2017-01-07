@@ -1,4 +1,5 @@
 ﻿using AspectCore.Lite.Abstractions;
+using AspectCore.Lite.Abstractions.Common;
 using AspectCore.Lite.Abstractions.Resolution;
 using AspectCore.Lite.Abstractions.Resolution.Common;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,20 +46,25 @@ namespace AspectCore.Lite.Container.DependencyInjection
             return CreateBuilder(containerBuilder).BuildServiceProvider();
         }
 
-        private static bool Validate(ServiceDescriptor serviceDescriptor, IAspectValidator aspectValidator)
+        private static bool Validate(ServiceDescriptor descriptor, IAspectValidator aspectValidator)
         {
-            var implementationType = serviceDescriptor.ImplementationType;
+            var implementationType = descriptor.ImplementationType;
             if (implementationType == null)
             {
                 return false;
             }
 
-            if (!serviceDescriptor.ServiceType.GetTypeInfo().ValidateAspect(aspectValidator))
+            if (!aspectValidator.Validate(descriptor.ServiceType))
             {
                 return false;
             }
 
-            if (!serviceDescriptor.ImplementationType.GetTypeInfo().CanInherited())
+            if (implementationType.IsDynamically())
+            {
+                return false;
+            }
+
+            if (!implementationType.GetTypeInfo().CanInherited())
             {
                 return false;
             }

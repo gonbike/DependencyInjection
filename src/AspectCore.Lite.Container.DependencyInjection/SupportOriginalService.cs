@@ -17,6 +17,7 @@ namespace AspectCore.Lite.Container.DependencyInjection
         {
             return serviceProvider.GetService(serviceType);
         }
+
         public void Dispose()
         {
             var disposable = serviceProvider as IDisposable;

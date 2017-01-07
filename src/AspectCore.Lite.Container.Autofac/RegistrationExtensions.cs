@@ -1,17 +1,23 @@
 ﻿using AspectCore.Lite.Abstractions;
 using AspectCore.Lite.Abstractions.Resolution;
+using AspectCore.Lite.Abstractions.Resolution.Common;
 using Autofac;
 using Autofac.Builder;
 using Autofac.Core;
 using System;
 using System.Linq;
 using System.Reflection;
+using Autofac.Core.Activators.Reflection;
 
 namespace AspectCore.Lite.Container.Autofac
 {
     public static class RegistrationExtensions
     {
-        public static IAspectConfigurator RegisterAspectConfiguration(this ContainerBuilder builder, Action<IAspectConfigurator> configure = null)
+        public static IAspectConfiguration RegisterAspectCore(this ContainerBuilder builder)
+        {
+            return RegisterAspectCore(builder, null);
+        }
+        public static IAspectConfiguration RegisterAspectCore(this ContainerBuilder builder, Action<IAspectConfiguration> configure)
         {
             if (builder == null)
             {
@@ -26,11 +32,11 @@ namespace AspectCore.Lite.Container.Autofac
             builder.RegisterType<AspectValidator>().As<IAspectValidator>().SingleInstance();
             builder.RegisterType<InterceptorMatcher>().As<IInterceptorMatcher>().SingleInstance();
 
-            var aspectConfigurator = new AspectConfigurator();
-            configure?.Invoke(aspectConfigurator);
-            builder.RegisterInstance<IAspectConfigurator>(aspectConfigurator).SingleInstance();
+            var aspectConfiguration = new AspectConfiguration();
+            configure?.Invoke(aspectConfiguration);
+            builder.RegisterInstance<IAspectConfiguration>(aspectConfiguration).SingleInstance();
 
-            return aspectConfigurator;
+            return aspectConfiguration;
         }
 
         public static void AsProxy<TLimit, TRegistrationStyle>(this IRegistrationBuilder<TLimit, ConcreteReflectionActivatorData, TRegistrationStyle> registration, Type serviceType)
@@ -40,15 +46,6 @@ namespace AspectCore.Lite.Container.Autofac
                 throw new ArgumentNullException(nameof(serviceType));
             }
             AsServiceProxy(registration, new TypedService(serviceType));
-        }
-
-        public static void AsProxy<TLimit, TRegistrationStyle>(this IRegistrationBuilder<TLimit, ConcreteReflectionActivatorData, TRegistrationStyle> registration, Type serviceType, IAspectConfigurator configurator)
-        {
-            if (serviceType == null)
-            {
-                throw new ArgumentNullException(nameof(serviceType));
-            }
-            AsServiceProxy(registration, new TypedService(serviceType), configurator);
         }
 
         public static void AsNamedProxy<TLimit, TRegistrationStyle>(this IRegistrationBuilder<TLimit, ConcreteReflectionActivatorData, TRegistrationStyle> registration, string serviceName, Type serviceType)
@@ -64,19 +61,6 @@ namespace AspectCore.Lite.Container.Autofac
             AsServiceProxy(registration, new KeyedService(serviceName, serviceType));
         }
 
-        public static void AsNamedProxy<TLimit, TRegistrationStyle>(this IRegistrationBuilder<TLimit, ConcreteReflectionActivatorData, TRegistrationStyle> registration, string serviceName, Type serviceType, IAspectConfigurator configurator)
-        {
-            if (serviceType == null)
-            {
-                throw new ArgumentNullException(nameof(serviceType));
-            }
-            if (serviceName == null)
-            {
-                throw new ArgumentNullException(nameof(serviceName));
-            }
-            AsServiceProxy(registration, new KeyedService(serviceName, serviceType), configurator);
-        }
-
         public static void AsKeyedProxy<TLimit, TRegistrationStyle>(this IRegistrationBuilder<TLimit, ConcreteReflectionActivatorData, TRegistrationStyle> registration, object serviceKey, Type serviceType)
         {
             if (serviceType == null)
@@ -90,25 +74,7 @@ namespace AspectCore.Lite.Container.Autofac
             AsServiceProxy(registration, new KeyedService(serviceKey, serviceType));
         }
 
-        public static void AsKeyedProxy<TLimit, TRegistrationStyle>(this IRegistrationBuilder<TLimit, ConcreteReflectionActivatorData, TRegistrationStyle> registration, object serviceKey, Type serviceType, IAspectConfigurator configurator)
-        {
-            if (serviceType == null)
-            {
-                throw new ArgumentNullException(nameof(serviceType));
-            }
-            if (serviceKey == null)
-            {
-                throw new ArgumentNullException(nameof(serviceKey));
-            }
-            AsServiceProxy(registration, new KeyedService(serviceKey, serviceType), configurator);
-        }
-
         public static void AsServiceProxy<TLimit, TRegistrationStyle>(this IRegistrationBuilder<TLimit, ConcreteReflectionActivatorData, TRegistrationStyle> registration, Service service)
-        {
-            AsServiceProxy(registration, service, null);
-        }
-
-        public static void AsServiceProxy<TLimit, TRegistrationStyle>(this IRegistrationBuilder<TLimit, ConcreteReflectionActivatorData, TRegistrationStyle> registration, Service service, IAspectConfigurator configurator)
         {
             if (registration == null)
             {
@@ -120,33 +86,42 @@ namespace AspectCore.Lite.Container.Autofac
                 throw new ArgumentNullException(nameof(service));
             }
 
-            var serviceWithType = service as IServiceWithType;
-            var aspectValidator = new AspectValidator(configurator ?? new AspectConfigurator());
-            Validate(serviceWithType.ServiceType, registration.ActivatorData.ImplementationType, aspectValidator);
+            if (!registration.ActivatorData.ImplementationType.GetTypeInfo().CanInherited())
+            {
+                throw new InvalidOperationException($"Validate implementation failed. Type {registration.ActivatorData.ImplementationType} cannot be inherited.");
+            }
 
             registration.As(service);
-            var activator = registration.ActivatorData.Activator;
-            registration.ActivatorData.ImplementationType = serviceWithType.ServiceType.CreateProxyType(registration.ActivatorData.ImplementationType, aspectValidator);
 
-            registration.OnPreparing(args =>
+            var activatorData = registration.ActivatorData;
+
+            registration.OnActivating(args =>
             {
+                var aspectValidator = args.Context.Resolve<IAspectValidator>();
+
+                var serviceType = service.GetServiceType();
+
+                if (!aspectValidator.Validate(serviceType))
+                {
+                    throw new InvalidOperationException($"Validate service failed. Type {serviceType} cannot be proxy.");
+                }
+
                 var parameters = args.Parameters.ToList();
-                var supportOriginalService = new SupportOriginalService(activator.ActivateInstance(args.Context, parameters));
+
                 parameters.Add(new ResolvedParameter((p, ctx) => p.ParameterType == typeof(IServiceProvider), (p, ctx) =>
                 {
                     return ctx.Resolve(p.ParameterType);
                 }));
-                parameters.Add(new PositionalParameter(parameters.Count, supportOriginalService));
-                args.Parameters = parameters;
-            });
-        }
 
-        private static void Validate(Type serviceType, Type implementationType, IAspectValidator aspectValidator)
-        {
-            if (!implementationType.GetTypeInfo().CanInherited())
-            {
-                throw new InvalidOperationException($"Register dynamicProxy failed.Type {implementationType.FullName} cannot be inherited.");
-            }
+                parameters.Add(new PositionalParameter(parameters.Count, new SupportOriginalService(args.Instance)));
+
+                var proxyType = new TypeGeneratorWrapper().CreateType(serviceType, activatorData.ImplementationType, aspectValidator);
+
+                var proxyActivator = new ReflectionActivator(proxyType, activatorData.ConstructorFinder,
+                    activatorData.ConstructorSelector, parameters, activatorData.ConfiguredProperties);
+
+                args.ReplaceInstance(proxyActivator.ActivateInstance(args.Context, parameters));
+            });
         }
     }
 }
