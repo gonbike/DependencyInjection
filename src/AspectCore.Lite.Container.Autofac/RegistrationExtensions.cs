@@ -26,7 +26,7 @@ namespace AspectCore.Lite.Container.Autofac
 
             builder.RegisterType<AspectActivator>().As<IAspectActivator>().InstancePerDependency();
             builder.RegisterType<AspectBuilder>().As<IAspectBuilder>().InstancePerDependency();
-            builder.RegisterType<DynamicProxyServiceProvider>().As<IServiceProvider>().InstancePerDependency();
+            builder.RegisterType<ServiceProvider>().As<IServiceProvider>().InstancePerDependency();
 
             builder.RegisterType<InterceptorInjector>().As<IInterceptorInjector>().InstancePerLifetimeScope();
             builder.RegisterType<AspectValidator>().As<IAspectValidator>().SingleInstance();

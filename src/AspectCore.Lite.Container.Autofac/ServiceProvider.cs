@@ -3,11 +3,11 @@ using System;
 
 namespace AspectCore.Lite.Container.Autofac
 {
-    internal class DynamicProxyServiceProvider : IServiceProvider
+    internal class ServiceProvider : IServiceProvider
     {
         private readonly IComponentContext componentContext;
 
-        public DynamicProxyServiceProvider(IComponentContext componentContext)
+        public ServiceProvider(IComponentContext componentContext)
         {
             this.componentContext = componentContext;
         }
