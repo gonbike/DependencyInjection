@@ -31,6 +31,7 @@ namespace AspectCore.Lite.Container.Autofac
             builder.RegisterType<InterceptorInjector>().As<IInterceptorInjector>().InstancePerLifetimeScope();
             builder.RegisterType<AspectValidator>().As<IAspectValidator>().SingleInstance();
             builder.RegisterType<InterceptorMatcher>().As<IInterceptorMatcher>().SingleInstance();
+            builder.RegisterType<ProxyGenerator>().As<IProxyGenerator>().SingleInstance();
 
             var aspectConfiguration = new AspectConfiguration();
             configure?.Invoke(aspectConfiguration);
@@ -115,7 +116,9 @@ namespace AspectCore.Lite.Container.Autofac
 
                 parameters.Add(new PositionalParameter(parameters.Count, new SupportOriginalService(args.Instance)));
 
-                var proxyType = new TypeGeneratorWrapper().CreateType(serviceType, activatorData.ImplementationType, aspectValidator);
+                var proxyGenerator = args.Context.Resolve<IProxyGenerator>();
+
+                var proxyType = proxyGenerator.CreateType(serviceType, activatorData.ImplementationType);
 
                 var proxyActivator = new ReflectionActivator(proxyType, activatorData.ConstructorFinder,
                     activatorData.ConstructorSelector, parameters, activatorData.ConfiguredProperties);

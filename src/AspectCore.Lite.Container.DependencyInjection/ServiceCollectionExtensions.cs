@@ -17,6 +17,7 @@ namespace AspectCore.Lite.Container.DependencyInjection
             services.TryAddTransient<IAspectActivator, AspectActivator>();
             services.TryAddTransient<IAspectBuilder, AspectBuilder>();
             services.TryAddScoped<IInterceptorInjector, InterceptorInjector>();
+            services.TryAddSingleton<IProxyGenerator, ProxyGenerator>();
             services.TryAddSingleton<IAspectValidator, AspectValidator>();
             services.TryAddSingleton<IInterceptorMatcher, InterceptorMatcher>();
             services.TryAddSingleton<IAspectConfiguration>(new AspectConfiguration());

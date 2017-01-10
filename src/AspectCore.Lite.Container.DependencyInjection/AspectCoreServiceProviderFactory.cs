@@ -19,7 +19,7 @@ namespace AspectCore.Lite.Container.DependencyInjection
 
             var dynamicProxyServices = new ServiceCollection();
 
-            var generator = new TypeGeneratorWrapper();
+            var generator = serviceProvider.GetServices<IProxyGenerator>();
 
             foreach (var descriptor in serviceCollection)
             {
@@ -28,7 +28,7 @@ namespace AspectCore.Lite.Container.DependencyInjection
                     dynamicProxyServices.Add(descriptor);
                     continue;
                 }
-                var proxyType = generator.CreateType(descriptor.ServiceType, descriptor.ImplementationType, aspectValidator);
+                var proxyType = generator.CreateType(descriptor.ServiceType, descriptor.ImplementationType);
                 dynamicProxyServices.Add(ServiceDescriptor.Describe(descriptor.ServiceType, proxyType, descriptor.Lifetime));
             }
 
