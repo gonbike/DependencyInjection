@@ -4,10 +4,10 @@ using AspectCore.Lite.Abstractions.Resolution.Common;
 using Autofac;
 using Autofac.Builder;
 using Autofac.Core;
+using Autofac.Core.Activators.Reflection;
 using System;
 using System.Linq;
 using System.Reflection;
-using Autofac.Core.Activators.Reflection;
 
 namespace AspectCore.Lite.Container.Autofac
 {
@@ -23,7 +23,7 @@ namespace AspectCore.Lite.Container.Autofac
             {
                 throw new ArgumentNullException(nameof(builder));
             }
-
+            
             builder.RegisterType<AspectActivator>().As<IAspectActivator>().InstancePerDependency();
             builder.RegisterType<AspectBuilder>().As<IAspectBuilder>().InstancePerDependency();
             builder.RegisterType<ServiceProvider>().As<IServiceProvider>().InstancePerDependency();

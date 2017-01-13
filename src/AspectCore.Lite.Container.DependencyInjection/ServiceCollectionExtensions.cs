@@ -36,7 +36,7 @@ namespace AspectCore.Lite.Container.DependencyInjection
             }
             var aspectConfiguration = new AspectConfiguration();
             configure.Invoke(aspectConfiguration);
-            services.TryAddSingleton<IAspectConfiguration>(aspectConfiguration);
+            services.AddSingleton<IAspectConfiguration>(aspectConfiguration);
             return services;
         }
     }

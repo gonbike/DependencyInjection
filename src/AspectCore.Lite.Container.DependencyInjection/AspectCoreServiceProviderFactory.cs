@@ -19,7 +19,7 @@ namespace AspectCore.Lite.Container.DependencyInjection
 
             var dynamicProxyServices = new ServiceCollection();
 
-            var generator = serviceProvider.GetServices<IProxyGenerator>();
+            var generator = serviceProvider.GetService<IProxyGenerator>();
 
             foreach (var descriptor in serviceCollection)
             {
