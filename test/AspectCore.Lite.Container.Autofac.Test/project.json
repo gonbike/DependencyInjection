@@ -10,7 +10,7 @@
     "System.Reflection": "4.3.0",
     "System.Linq": "4.3.0",
     "AspectCore.Lite.Container.Test.Fakes": "1.0.0-*",
-    "AspectCore.Lite.Container.Autofac": "1.0.0-beta5-13100"
+    "AspectCore.Lite.Container.Autofac": "1.1.0-*"
   },
   "testRunner": "xunit",
   "frameworks": {
