@@ -1,23 +1,22 @@
 ﻿using AspectCore.Lite.Abstractions;
 using AspectCore.Lite.Abstractions.Resolution;
-using AspectCore.Lite.Abstractions.Resolution.Common;
 using Autofac;
 using Autofac.Builder;
 using Autofac.Core;
 using Autofac.Core.Activators.Reflection;
 using System;
 using System.Linq;
-using System.Reflection;
 
 namespace AspectCore.Lite.Container.Autofac
 {
     public static class RegistrationExtensions
     {
-        public static IAspectConfiguration RegisterAspectCore(this ContainerBuilder builder)
+        public static ContainerBuilder RegisterAspectCore(this ContainerBuilder builder)
         {
             return RegisterAspectCore(builder, null);
         }
-        public static IAspectConfiguration RegisterAspectCore(this ContainerBuilder builder, Action<IAspectConfiguration> configure)
+
+        public static ContainerBuilder RegisterAspectCore(this ContainerBuilder builder, Action<IAspectConfiguration> configure)
         {
             if (builder == null)
             {
@@ -37,7 +36,7 @@ namespace AspectCore.Lite.Container.Autofac
             configure?.Invoke(aspectConfiguration);
             builder.RegisterInstance<IAspectConfiguration>(aspectConfiguration).SingleInstance();
 
-            return aspectConfiguration;
+            return builder;
         }
 
         public static void AsProxy<TLimit, TRegistrationStyle>(this IRegistrationBuilder<TLimit, ConcreteReflectionActivatorData, TRegistrationStyle> registration, Type serviceType)
@@ -87,25 +86,13 @@ namespace AspectCore.Lite.Container.Autofac
                 throw new ArgumentNullException(nameof(service));
             }
 
-            if (!registration.ActivatorData.ImplementationType.GetTypeInfo().CanInherited())
-            {
-                throw new InvalidOperationException($"Validate implementation failed. Type {registration.ActivatorData.ImplementationType} cannot be inherited.");
-            }
-
             registration.As(service);
 
             var activatorData = registration.ActivatorData;
 
             registration.OnActivating(args =>
             {
-                var aspectValidator = args.Context.Resolve<IAspectValidator>();
-
                 var serviceType = service.GetServiceType();
-
-                if (!aspectValidator.Validate(serviceType))
-                {
-                    throw new InvalidOperationException($"Validate service failed. Type {serviceType} cannot be proxy.");
-                }
 
                 var parameters = args.Parameters.ToList();
 

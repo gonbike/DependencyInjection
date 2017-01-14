@@ -1,7 +1,6 @@
 ﻿using AspectCore.Lite.Abstractions;
-using AspectCore.Lite.Abstractions.Common;
+using AspectCore.Lite.Abstractions.Extensions;
 using AspectCore.Lite.Abstractions.Resolution;
-using AspectCore.Lite.Abstractions.Resolution.Common;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
@@ -13,7 +12,7 @@ namespace AspectCore.Lite.Container.DependencyInjection
     {
         public IServiceCollection CreateBuilder(IServiceCollection serviceCollection)
         {
-            var serviceProvider = serviceCollection.TryAddAspectCoreLite().BuildServiceProvider();
+            var serviceProvider = serviceCollection.TryAddAspectCore().BuildServiceProvider();
 
             var aspectValidator = serviceProvider.GetRequiredService<IAspectValidator>();
 
@@ -59,7 +58,7 @@ namespace AspectCore.Lite.Container.DependencyInjection
                 return false;
             }
 
-            if (implementationType.IsDynamically())
+            if (implementationType.GetTypeInfo().IsDynamically())
             {
                 return false;
             }

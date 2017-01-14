@@ -8,7 +8,7 @@ namespace AspectCore.Lite.Container.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        internal static IServiceCollection TryAddAspectCoreLite(this IServiceCollection services)
+        internal static IServiceCollection TryAddAspectCore(this IServiceCollection services)
         {
             if (services == null)
             {
@@ -20,7 +20,7 @@ namespace AspectCore.Lite.Container.DependencyInjection
             services.TryAddSingleton<IProxyGenerator, ProxyGenerator>();
             services.TryAddSingleton<IAspectValidator, AspectValidator>();
             services.TryAddSingleton<IInterceptorMatcher, InterceptorMatcher>();
-            services.TryAddSingleton<IAspectConfiguration>(new AspectConfiguration());
+            services.TryAddSingleton<IAspectConfiguration, AspectConfiguration>();
             return services;
         }
 

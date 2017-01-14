@@ -1,18 +1,18 @@
 {
   "authors": [ "liuhaoyang" ],
   "dependencies": {
-    "AspectCore.Lite.Abstractions.Resolution": "1.0.0-beta5-13100",
+    "AspectCore.Lite.Abstractions.Resolution": "1.0.0-beta5-13128",
     "Autofac": "4.0.1"
   },
   "description": "Interceptor and dynamicProxy support for Autofac via AspectCore Lite",
   "frameworks": {
+    "net451": {},
     "netstandard1.6": {
       "dependencies": {
-        "NETStandard.Library": "1.6.1",
+        "NETStandard.Library": "1.6.0",
         "System.ComponentModel": "4.3.0"
       }
-    },
-    "net451": {}
+    }
   },
   "packOptions": {
     "iconUrl": "https://avatars1.githubusercontent.com/u/19426425?v=3&s=200",
@@ -27,5 +27,5 @@
   },
   "projectUrl": "https://github.com/AspectCore/Lite.Container",
   "title": "AspectCore.Lite.Container.Autofac",
-  "version": "1.0.0-beta5-13100"
+  "version": "1.0.0-beta5-13128"
 }
