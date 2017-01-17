@@ -8,8 +8,8 @@ for /R "packages" %%s in (*) do (
     del %%s
 )
 
-dotnet pack src/AspectCore.Lite.Container.Autofac --configuration Release --output packages
-dotnet pack src/AspectCore.Lite.Container.DependencyInjection --configuration Release --output packages
+dotnet pack src/AspectCore.Container.Autofac --configuration Release --output packages
+dotnet pack src/AspectCore.Container.DependencyInjection --configuration Release --output packages
 
 set /p key=input key:
 set source=http://servicepackages.chinacloudsites.cn/nuget
