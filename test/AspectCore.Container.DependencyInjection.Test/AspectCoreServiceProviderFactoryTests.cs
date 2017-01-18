@@ -5,6 +5,7 @@ using System;
 using System.Reflection;
 using Xunit;
 using AspectCore.Abstractions;
+using AspectCore.Abstractions.Resolution;
 
 namespace AspectCore.Container.DependencyInjection.Test
 {
@@ -33,6 +34,7 @@ namespace AspectCore.Container.DependencyInjection.Test
         [InlineData(typeof(IInterceptorInjector))]
         [InlineData(typeof(IInterceptorMatcher))]
         [InlineData(typeof(IProxyGenerator))]
+        [InlineData(typeof(TargetInstanceProvider))]
         public void CreateBuilderWithAspectCoreServices_Test(Type serviceType)
         {
             var services = new ServiceCollection();

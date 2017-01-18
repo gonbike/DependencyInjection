@@ -1,8 +1,5 @@
 ﻿using AspectCore.Abstractions;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 using Autofac;
 using AspectCore.Container.Test.Fakes;
@@ -27,6 +24,7 @@ namespace AspectCore.Container.Autofac.Test
         [InlineData(typeof(IInterceptorMatcher))]
         [InlineData(typeof(IProxyGenerator))]
         [InlineData(typeof(IServiceProvider))]
+        [InlineData(typeof(IOriginalServiceProvider))]
         public void RegisterAspectCore_Test(Type serviceType)
         {
             var container = CreateBuilder().Build();
@@ -68,7 +66,23 @@ namespace AspectCore.Container.Autofac.Test
         }
 
         [Fact]
-        public void SupportOriginalService_Test()
+        public void AsProxyWithParamter_Test()
+        {
+            var builder = CreateBuilder();
+            builder.RegisterType<Service>().AsProxy(typeof(IService));
+            builder.RegisterType<Controller>().AsProxy(typeof(IController));
+            var container = builder.Build();
+
+            var proxyService = container.Resolve<IService>();
+            Assert.True(proxyService.GetType().GetTypeInfo().IsDynamically());
+            Assert.Equal(proxyService.Get(1), proxyService.Get(1));
+
+            var proxyController = container.Resolve<IController>();
+            Assert.Equal(proxyService.Get(100), proxyController.Execute());
+        }
+
+        [Fact]
+        public void OriginalServiceProvider_Test()
         {
             var builder = CreateBuilder();
             builder.RegisterType<Service>().AsProxy(typeof(IService));
@@ -76,6 +90,27 @@ namespace AspectCore.Container.Autofac.Test
             var proxyService = container.Resolve<IOriginalServiceProvider>().GetService<IService>();
             Assert.False(proxyService.GetType().GetTypeInfo().IsDynamically());
             Assert.NotEqual(proxyService.Get(1), proxyService.Get(1));
+        }
+
+        [Fact]
+        public void OriginalServiceProviderWithParameter_Test()
+        {
+            var builder = CreateBuilder();
+            builder.RegisterType<Service>().AsProxy(typeof(IService));
+            builder.RegisterType<Controller>().AsProxy(typeof(IController));
+
+            var container = builder.Build();
+
+            var proxyService = container.Resolve<IOriginalServiceProvider>().GetService<IService>();
+
+            Assert.False(proxyService.GetType().GetTypeInfo().IsDynamically());
+
+            var proxyController = container.Resolve<IOriginalServiceProvider>().GetService<IController>();
+
+            Assert.False(proxyController.GetType().GetTypeInfo().IsDynamically());
+            Assert.False(proxyController.Service.GetType().GetTypeInfo().IsDynamically());
+
+            Assert.NotEqual(proxyService.Get(100), proxyController.Execute());
         }
     }
 }

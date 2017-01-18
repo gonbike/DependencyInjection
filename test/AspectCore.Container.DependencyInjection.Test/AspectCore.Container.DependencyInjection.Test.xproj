@@ -7,7 +7,7 @@
   <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.Props" Condition="'$(VSToolsPath)' != ''" />
   <PropertyGroup Label="Globals">
     <ProjectGuid>a8b2b7ad-f5cd-4fb7-b0cf-a35a6c33aea7</ProjectGuid>
-    <RootNamespace>AspectCore.Lite.Container.DependencyInjection.Test</RootNamespace>
+    <RootNamespace>AspectCore.Container.DependencyInjection.Test</RootNamespace>
     <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">.\obj</BaseIntermediateOutputPath>
     <OutputPath Condition="'$(OutputPath)'=='' ">.\bin\</OutputPath>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>

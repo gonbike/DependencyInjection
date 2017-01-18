@@ -28,12 +28,13 @@ namespace AspectCore.Container.DependencyInjection
                 }
                 var proxyType = generator.CreateType(descriptor.ServiceType, descriptor.ImplementationType);
                 dynamicProxyServices.Add(ServiceDescriptor.Describe(descriptor.ServiceType, proxyType, descriptor.Lifetime));
+                ServiceTargetInstanceProvider.MapServiceDescriptor(descriptor);
             }
 
             dynamicProxyServices.AddScoped<IOriginalServiceProvider>(p =>
             {
                 var scopedProvider = serviceProvider.GetService<IServiceScopeFactory>().CreateScope().ServiceProvider;
-                return new SupportOriginalService(scopedProvider);
+                return new OriginalServiceProvider(scopedProvider);
             });
 
             return dynamicProxyServices;

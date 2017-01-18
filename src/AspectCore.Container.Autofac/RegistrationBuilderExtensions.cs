@@ -1,15 +1,18 @@
 ﻿using AspectCore.Abstractions;
+using AspectCore.Abstractions.Extensions;
+using AspectCore.Abstractions.Resolution;
 using Autofac;
 using Autofac.Builder;
 using Autofac.Core;
 using Autofac.Core.Activators.Reflection;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace AspectCore.Container.Autofac
 {
     public static class RegistrationBuilderExtensions
-    {    
+    {
         public static void AsProxy<TLimit, TRegistrationStyle>(this IRegistrationBuilder<TLimit, ConcreteReflectionActivatorData, TRegistrationStyle> registration, Type serviceType)
         {
             if (serviceType == null)
@@ -69,21 +72,19 @@ namespace AspectCore.Container.Autofac
 
                 var parameters = args.Parameters.ToList();
 
-                parameters.Add(new ResolvedParameter((p, ctx) => p.ParameterType == typeof(IServiceProvider), (p, ctx) =>
-                {
-                    return ctx.Resolve(p.ParameterType);
-                }));
-
-                parameters.Add(new PositionalParameter(parameters.Count, new InstanceOriginalServiceProvider(args.Instance)));
+                parameters.Add(new TypedParameter(typeof(TargetInstanceProvider), new ParameterTargetInstanceProvider(args.Instance)));
+                parameters.Add(new ResolvedParameter((pi, ctx) => pi.ParameterType == typeof(IServiceProvider), (pi, ctx) => ctx.Resolve<IServiceProvider>()));
 
                 var proxyGenerator = args.Context.Resolve<IProxyGenerator>();
 
                 var proxyType = proxyGenerator.CreateType(serviceType, activatorData.ImplementationType);
 
                 var proxyActivator = new ReflectionActivator(proxyType, activatorData.ConstructorFinder,
-                    activatorData.ConstructorSelector, parameters, activatorData.ConfiguredProperties);
+                    activatorData.ConstructorSelector, EmptyArray<Parameter>.Value, activatorData.ConfiguredProperties);
 
-                args.ReplaceInstance(proxyActivator.ActivateInstance(args.Context, parameters));
+                var proxyValue = proxyActivator.ActivateInstance(args.Context, parameters);
+
+                args.ReplaceInstance(proxyValue);
             });
         }
     }

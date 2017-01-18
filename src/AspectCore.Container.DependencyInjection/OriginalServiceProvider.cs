@@ -1,20 +1,21 @@
 ﻿using AspectCore.Abstractions;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 
 namespace AspectCore.Container.DependencyInjection
 {
-    internal sealed class SupportOriginalService : IOriginalServiceProvider
+    internal sealed class OriginalServiceProvider : IOriginalServiceProvider
     {
         private readonly IServiceProvider serviceProvider;
 
-        public SupportOriginalService(IServiceProvider serviceProvider)
+        public OriginalServiceProvider(IServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
         }
 
         public object GetService(Type serviceType)
         {
-            return serviceProvider.GetService(serviceType);
+            return serviceProvider.GetRequiredService(serviceType);
         }
     }
 }
