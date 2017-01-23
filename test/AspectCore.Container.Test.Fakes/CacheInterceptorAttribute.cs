@@ -9,7 +9,7 @@ namespace AspectCore.Container.Test.Fakes
     {
         private readonly IDictionary<int, Model> cache = new Dictionary<int, Model>();
 
-        public async override Task Invoke(IAspectContext context, AspectDelegate next)
+        public async override Task Invoke(AspectContext context, AspectDelegate next)
         {
             var parameters = context.Parameters;
             if (parameters.Any())
