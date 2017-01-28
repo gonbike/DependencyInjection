@@ -1,5 +1,4 @@
-﻿using AspectCore.Abstractions;
-using AspectCore.Abstractions.Resolution;
+﻿using AspectCore.Abstractions.Resolution.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Concurrent;
@@ -8,7 +7,7 @@ using System.Linq;
 
 namespace AspectCore.Container.DependencyInjection
 {
-    internal sealed class ServiceTargetInstanceProvider : TargetInstanceProvider, IDisposable
+    internal sealed class ServiceInstanceProvider : IServiceInstanceProvider, IDisposable
     {
         private readonly static ConcurrentDictionary<Type, IList<ServiceDescriptor>> ServiceDescriptorCache = new ConcurrentDictionary<Type, IList<ServiceDescriptor>>();
 
@@ -18,7 +17,7 @@ namespace AspectCore.Container.DependencyInjection
 
         private readonly object resolveLock = new object();
 
-        public ServiceTargetInstanceProvider(IServiceProvider serviceProvider)
+        public ServiceInstanceProvider(IServiceProvider serviceProvider)
         {
             if (serviceProvider == null)
             {
@@ -28,7 +27,7 @@ namespace AspectCore.Container.DependencyInjection
             this.serviceProvider = serviceProvider;
         }
 
-        public override object GetInstance(Type serviceType)
+        public object GetInstance(Type serviceType)
         {
             if (serviceType == null)
             {
@@ -39,7 +38,7 @@ namespace AspectCore.Container.DependencyInjection
 
             if (!ServiceDescriptorCache.TryGetValue(serviceType, out descriptorList))
             {
-                return serviceProvider.GetRequiredService<IOriginalServiceProvider>().GetService(serviceType);
+                return serviceProvider.GetRequiredService(serviceType);
             }
 
             var descriptor = descriptorList.Last();
@@ -53,7 +52,7 @@ namespace AspectCore.Container.DependencyInjection
 
             var resolvedServices = GetOrAddResolvedCache();
 
-            return resolvedServices.GetOrAdd(serviceType, _ => factory(serviceProvider, descriptor.ImplementationType));  
+            return resolvedServices.GetOrAdd(serviceType, _ => factory(serviceProvider, descriptor.ImplementationType));
         }
 
         private Func<IServiceProvider, Type, object> GetObjectFactory()
