@@ -16,15 +16,16 @@ namespace AspectCore.Container.Autofac.Test
         }
 
         [Theory]
-        [InlineData(typeof(IAspectActivator))]
-        [InlineData(typeof(IAspectBuilder))]
-        [InlineData(typeof(IAspectConfiguration))]
-        [InlineData(typeof(IAspectValidator))]
-        [InlineData(typeof(IInterceptorInjector))]
-        [InlineData(typeof(IInterceptorMatcher))]
-        [InlineData(typeof(IProxyGenerator))]
         [InlineData(typeof(IServiceProvider))]
         [InlineData(typeof(IOriginalServiceProvider))]
+        [InlineData(typeof(IAspectActivator))]
+        [InlineData(typeof(IAspectBuilderProvider))]
+        [InlineData(typeof(IInterceptorSelector))]
+        [InlineData(typeof(IAspectConfiguration))]
+        [InlineData(typeof(IInterceptorInjectorProvider))]
+        [InlineData(typeof(IInterceptorMatcher))]
+        [InlineData(typeof(IAspectValidator))]
+        [InlineData(typeof(IProxyGenerator))]
         public void RegisterAspectCore_Test(Type serviceType)
         {
             var container = CreateBuilder().Build();

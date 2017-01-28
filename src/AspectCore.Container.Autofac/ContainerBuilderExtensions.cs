@@ -1,5 +1,6 @@
 ﻿using AspectCore.Abstractions;
 using AspectCore.Abstractions.Resolution;
+using AspectCore.Abstractions.Resolution.Internal;
 using Autofac;
 using System;
 
@@ -19,15 +20,25 @@ namespace AspectCore.Container.Autofac
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            builder.RegisterType<AspectActivator>().As<IAspectActivator>().InstancePerDependency();
-            builder.RegisterType<AspectBuilder>().As<IAspectBuilder>().InstancePerDependency();
             builder.RegisterType<AutofacServiceProvider>().As<IServiceProvider>().InstancePerDependency();
+
             builder.RegisterType<AutofacOriginalServiceProvider>().As<IOriginalServiceProvider>().InstancePerDependency();
 
-            builder.RegisterType<InterceptorInjector>().As<IInterceptorInjector>().InstancePerLifetimeScope();
-            builder.RegisterType<AspectValidator>().As<IAspectValidator>().SingleInstance();
-            builder.RegisterType<InterceptorMatcher>().As<IInterceptorMatcher>().SingleInstance();
-            builder.RegisterType<ProxyGenerator>().As<IProxyGenerator>().SingleInstance();
+            builder.RegisterType<AspectActivator>().As<IAspectActivator>().InstancePerLifetimeScope();
+
+            builder.RegisterType<AspectBuilderProvider>().As<IAspectBuilderProvider>().InstancePerLifetimeScope();
+
+            builder.RegisterType<InterceptorSelector>().As<IInterceptorSelector>().InstancePerLifetimeScope();
+
+            builder.RegisterType<InterceptorInjectorProvider>().As<IInterceptorInjectorProvider>().InstancePerLifetimeScope();
+
+            builder.RegisterType<PropertyInjectorSelector>().As<IPropertyInjectorSelector>().InstancePerLifetimeScope();
+
+            builder.RegisterType<InterceptorMatcher>().As<IInterceptorMatcher>().InstancePerLifetimeScope();
+
+            builder.RegisterType<AspectValidator>().As<IAspectValidator>().InstancePerLifetimeScope();
+
+            builder.RegisterType<ProxyGenerator>().As<IProxyGenerator>().InstancePerLifetimeScope();
 
             var aspectConfiguration = new AspectConfiguration();
             configure?.Invoke(aspectConfiguration);

@@ -1,11 +1,11 @@
-﻿using AspectCore.Container.Test.Fakes;
-using Microsoft.Extensions.DependencyInjection;
+﻿using AspectCore.Abstractions;
 using AspectCore.Abstractions.Extensions;
+using AspectCore.Abstractions.Resolution.Internal;
+using AspectCore.Container.Test.Fakes;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Reflection;
 using Xunit;
-using AspectCore.Abstractions;
-using AspectCore.Abstractions.Resolution;
 
 namespace AspectCore.Container.DependencyInjection.Test
 {
@@ -28,13 +28,15 @@ namespace AspectCore.Container.DependencyInjection.Test
 
         [Theory]
         [InlineData(typeof(IAspectActivator))]
-        [InlineData(typeof(IAspectBuilder))]
+        [InlineData(typeof(IAspectBuilderProvider))]
+        [InlineData(typeof(IInterceptorSelector))]
+        [InlineData(typeof(IInterceptorInjectorProvider))]
+        [InlineData(typeof(IServiceInstanceProvider))]
+        [InlineData(typeof(IPropertyInjectorSelector))]
+        [InlineData(typeof(IInterceptorMatcher))]
         [InlineData(typeof(IAspectConfiguration))]
         [InlineData(typeof(IAspectValidator))]
-        [InlineData(typeof(IInterceptorInjector))]
-        [InlineData(typeof(IInterceptorMatcher))]
         [InlineData(typeof(IProxyGenerator))]
-        [InlineData(typeof(TargetInstanceProvider))]
         public void CreateBuilderWithAspectCoreServices_Test(Type serviceType)
         {
             var services = new ServiceCollection();

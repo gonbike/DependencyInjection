@@ -1,12 +1,11 @@
 ﻿using AspectCore.Abstractions;
 using AspectCore.Abstractions.Extensions;
-using AspectCore.Abstractions.Resolution;
+using AspectCore.Abstractions.Resolution.Internal;
 using Autofac;
 using Autofac.Builder;
 using Autofac.Core;
 using Autofac.Core.Activators.Reflection;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace AspectCore.Container.Autofac
@@ -62,17 +61,23 @@ namespace AspectCore.Container.Autofac
 
             registration.As(service);
 
+            var serviceType = service.GetServiceType();
+
+            var autofacAspectValidator = new AutofacAspectValidator();
+
+            autofacAspectValidator.ValidateAndThrowException(serviceType);
+
+            autofacAspectValidator.ValidateInheritedAndThrowException(registration.ActivatorData.ImplementationType);
+
             var activatorData = registration.ActivatorData;
 
             AutofacOriginalServiceProvider.MapActivatorData(service.GetServiceType(), activatorData);
 
             registration.OnActivating(args =>
             {
-                var serviceType = service.GetServiceType();
-
                 var parameters = args.Parameters.ToList();
 
-                parameters.Add(new TypedParameter(typeof(TargetInstanceProvider), new ParameterTargetInstanceProvider(args.Instance)));
+                parameters.Add(new TypedParameter(typeof(IServiceInstanceProvider), new ParameterServiceInstanceProvider(args.Instance)));
                 parameters.Add(new ResolvedParameter((pi, ctx) => pi.ParameterType == typeof(IServiceProvider), (pi, ctx) => ctx.Resolve<IServiceProvider>()));
 
                 var proxyGenerator = args.Context.Resolve<IProxyGenerator>();

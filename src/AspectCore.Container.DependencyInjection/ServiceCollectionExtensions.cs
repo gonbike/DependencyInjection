@@ -1,5 +1,6 @@
 ﻿using AspectCore.Abstractions;
 using AspectCore.Abstractions.Resolution;
+using AspectCore.Abstractions.Resolution.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
@@ -14,14 +15,27 @@ namespace AspectCore.Container.DependencyInjection
             {
                 throw new ArgumentNullException(nameof(services));
             }
-            services.TryAddTransient<IAspectActivator, AspectActivator>();
-            services.TryAddTransient<IAspectBuilder, AspectBuilder>();
-            services.TryAddScoped<IInterceptorInjector, InterceptorInjector>();
-            services.TryAddScoped<TargetInstanceProvider, ServiceTargetInstanceProvider>();
-            services.TryAddSingleton<IProxyGenerator, ProxyGenerator>();
-            services.TryAddSingleton<IAspectValidator, AspectValidator>();
+
+            services.TryAddScoped<IAspectActivator, AspectActivator>();
+
+            services.TryAddScoped<IAspectBuilderProvider, AspectBuilderProvider>();
+
+            services.TryAddScoped<IInterceptorSelector, InterceptorSelector>();
+
+            services.TryAddScoped<IInterceptorInjectorProvider, InterceptorInjectorProvider>();
+
+            services.TryAddScoped<IServiceInstanceProvider, ServiceInstanceProvider>();
+
+            services.TryAddSingleton<IPropertyInjectorSelector, PropertyInjectorSelector>();
+
             services.TryAddSingleton<IInterceptorMatcher, InterceptorMatcher>();
+
             services.TryAddSingleton<IAspectConfiguration, AspectConfiguration>();
+
+            services.TryAddSingleton<IAspectValidator, AspectValidator>();
+
+            services.TryAddSingleton<IProxyGenerator, ProxyGenerator>();  
+               
             return services;
         }
 
@@ -35,9 +49,11 @@ namespace AspectCore.Container.DependencyInjection
             {
                 throw new ArgumentNullException(nameof(configure));
             }
+
             var aspectConfiguration = new AspectConfiguration();
             configure.Invoke(aspectConfiguration);
             services.AddSingleton<IAspectConfiguration>(aspectConfiguration);
+
             return services;
         }
     }
