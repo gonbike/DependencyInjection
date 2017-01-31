@@ -36,7 +36,7 @@ namespace AspectCore.Container.Autofac.Test
         public void AsProxy_Test()
         {
             var builder = CreateBuilder();
-            builder.RegisterType<Service>().AsProxy(typeof(IService));
+            builder.RegisterType<Service>().As<IService>().AsInterfacesProxy();
             var container = builder.Build();
             var proxyService = container.Resolve<IService>();
             Assert.True(proxyService.GetType().GetTypeInfo().IsDynamically());
@@ -47,7 +47,7 @@ namespace AspectCore.Container.Autofac.Test
         public void AsNamedProxy_Test()
         {
             var builder = CreateBuilder();
-            builder.RegisterType<Service>().AsNamedProxy("proxy", typeof(IService));
+            builder.RegisterType<Service>().Named<IService>("proxy").AsInterfacesProxy();
             var container = builder.Build();
             var proxyService = container.ResolveNamed<IService>("proxy");
             Assert.True(proxyService.GetType().GetTypeInfo().IsDynamically());
@@ -59,7 +59,7 @@ namespace AspectCore.Container.Autofac.Test
         {
             var builder = CreateBuilder();
             var key = new object();
-            builder.RegisterType<Service>().AsKeyedProxy(key, typeof(IService));
+            builder.RegisterType<Service>().Keyed<IService>(key).AsInterfacesProxy();
             var container = builder.Build();
             var proxyService = container.ResolveKeyed<IService>(key);
             Assert.True(proxyService.GetType().GetTypeInfo().IsDynamically());
@@ -70,8 +70,8 @@ namespace AspectCore.Container.Autofac.Test
         public void AsProxyWithParamter_Test()
         {
             var builder = CreateBuilder();
-            builder.RegisterType<Service>().AsProxy(typeof(IService));
-            builder.RegisterType<Controller>().AsProxy(typeof(IController));
+            builder.RegisterType<Service>().As<IService>().AsInterfacesProxy();
+            builder.RegisterType<Controller>().As<IController>().AsInterfacesProxy();
             var container = builder.Build();
 
             var proxyService = container.Resolve<IService>();
@@ -86,7 +86,7 @@ namespace AspectCore.Container.Autofac.Test
         public void OriginalServiceProvider_Test()
         {
             var builder = CreateBuilder();
-            builder.RegisterType<Service>().AsProxy(typeof(IService));
+            builder.RegisterType<Service>().As<IService>().AsInterfacesProxy();
             var container = builder.Build();
             var proxyService = container.Resolve<IOriginalServiceProvider>().GetService<IService>();
             Assert.False(proxyService.GetType().GetTypeInfo().IsDynamically());
@@ -97,8 +97,8 @@ namespace AspectCore.Container.Autofac.Test
         public void OriginalServiceProviderWithParameter_Test()
         {
             var builder = CreateBuilder();
-            builder.RegisterType<Service>().AsProxy(typeof(IService));
-            builder.RegisterType<Controller>().AsProxy(typeof(IController));
+            builder.RegisterType<Service>().As<IService>().AsInterfacesProxy();
+            builder.RegisterType<Controller>().As<IController>().AsInterfacesProxy();
 
             var container = builder.Build();
 

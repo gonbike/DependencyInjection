@@ -26,7 +26,15 @@ namespace AspectCore.Container.DependencyInjection
                     dynamicProxyServices.Add(descriptor);
                     continue;
                 }
-                var proxyType = generator.CreateType(descriptor.ServiceType, descriptor.ImplementationType);
+                Type proxyType;
+                if (descriptor.ServiceType.GetTypeInfo().IsInterface)
+                {
+                    proxyType = generator.CreateInterfaceProxyType(descriptor.ServiceType, descriptor.ImplementationType);
+                }
+                else
+                {
+                    proxyType = generator.CreateClassProxyType(descriptor.ServiceType, descriptor.ImplementationType);
+                }
                 dynamicProxyServices.Add(ServiceDescriptor.Describe(descriptor.ServiceType, proxyType, descriptor.Lifetime));
                 ServiceInstanceProvider.MapServiceDescriptor(descriptor);
             }

@@ -22,7 +22,6 @@ namespace AspectCore.Container.DependencyInjection.Test
             Assert.NotNull(descriptor.ImplementationType);
             Assert.Equal(descriptor.Lifetime, ServiceLifetime.Transient);
             Assert.IsNotType<Service>(descriptor.ImplementationType);
-            Assert.True(descriptor.ImplementationType.GetTypeInfo().BaseType == typeof(Service));
             Assert.True(descriptor.ImplementationType.GetTypeInfo().IsDynamically());
         }
 
