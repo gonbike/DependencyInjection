@@ -33,7 +33,7 @@ namespace AspectCore.Container.DependencyInjection.Test
         [InlineData(typeof(IServiceInstanceProvider))]
         [InlineData(typeof(IPropertyInjectorSelector))]
         [InlineData(typeof(IInterceptorMatcher))]
-        [InlineData(typeof(IAspectConfiguration))]
+        [InlineData(typeof(IAspectConfigure))]
         [InlineData(typeof(IAspectValidator))]
         [InlineData(typeof(IProxyGenerator))]
         public void CreateBuilderWithAspectCoreServices_Test(Type serviceType)

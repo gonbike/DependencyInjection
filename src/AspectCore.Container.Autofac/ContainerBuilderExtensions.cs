@@ -13,7 +13,7 @@ namespace AspectCore.Container.Autofac
             return RegisterAspectCore(builder, null);
         }
 
-        public static ContainerBuilder RegisterAspectCore(this ContainerBuilder builder, Action<IAspectConfiguration> configure)
+        public static ContainerBuilder RegisterAspectCore(this ContainerBuilder builder, Action<IAspectConfigure> configure)
         {
             if (builder == null)
             {
@@ -40,9 +40,9 @@ namespace AspectCore.Container.Autofac
 
             builder.RegisterType<ProxyGenerator>().As<IProxyGenerator>().InstancePerLifetimeScope();
 
-            var aspectConfiguration = new AspectConfiguration();
-            configure?.Invoke(aspectConfiguration);
-            builder.RegisterInstance<IAspectConfiguration>(aspectConfiguration).SingleInstance();
+            var aspectConfigure = new AspectConfigure();
+            configure?.Invoke(aspectConfigure);
+            builder.RegisterInstance<IAspectConfigure>(aspectConfigure).SingleInstance();
 
             return builder;
         }

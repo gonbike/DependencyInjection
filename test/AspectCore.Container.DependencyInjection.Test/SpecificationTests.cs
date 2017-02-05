@@ -9,7 +9,7 @@ namespace AspectCore.Container.DependencyInjection.Test
     {
         protected override IServiceProvider CreateServiceProvider(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddSingleton<IAspectConfiguration, NonIgnoreAspectConfiguration>();
+            serviceCollection.AddSingleton<IAspectConfigure, NonIgnoreAspectConfiguration>();
             var aspectCoreServiceProviderFactory = new AspectCoreServiceProviderFactory();
             return aspectCoreServiceProviderFactory.CreateServiceProvider(serviceCollection);
         }

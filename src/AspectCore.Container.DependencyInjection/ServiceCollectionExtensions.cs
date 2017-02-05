@@ -30,7 +30,7 @@ namespace AspectCore.Container.DependencyInjection
 
             services.TryAddSingleton<IInterceptorMatcher, InterceptorMatcher>();
 
-            services.TryAddSingleton<IAspectConfiguration, AspectConfiguration>();
+            services.TryAddSingleton<IAspectConfigure, AspectConfigure>();
 
             services.TryAddSingleton<IAspectValidator, AspectValidator>();
 
@@ -39,7 +39,7 @@ namespace AspectCore.Container.DependencyInjection
             return services;
         }
 
-        public static IServiceCollection AddAspectConfiguration(this IServiceCollection services, Action<IAspectConfiguration> configure)
+        public static IServiceCollection AddAspectConfigure(this IServiceCollection services, Action<IAspectConfigure> configure)
         {
             if (services == null)
             {
@@ -50,9 +50,9 @@ namespace AspectCore.Container.DependencyInjection
                 throw new ArgumentNullException(nameof(configure));
             }
 
-            var aspectConfiguration = new AspectConfiguration();
-            configure.Invoke(aspectConfiguration);
-            services.AddSingleton<IAspectConfiguration>(aspectConfiguration);
+            var aspectConfigure = new AspectConfigure();
+            configure.Invoke(aspectConfigure);
+            services.AddSingleton<IAspectConfigure>(aspectConfigure);
 
             return services;
         }

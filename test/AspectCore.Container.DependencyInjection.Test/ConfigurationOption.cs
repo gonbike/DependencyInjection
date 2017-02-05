@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace AspectCore.Container.DependencyInjection.Test
 {
-    public class ConfigurationOption<TOption> : IConfigurationOption<TOption>
+    public class ConfigurationOption<TOption> : IAspectConfigureOption<TOption>
     {
         private readonly ICollection<Func<MethodInfo, TOption>> collection = new List<Func<MethodInfo, TOption>>();
 

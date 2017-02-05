@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 
 namespace AspectCore.Container.DependencyInjection.Test
 {
-    public class NonIgnoreAspectConfiguration : IAspectConfiguration
+    public class NonIgnoreAspectConfiguration : IAspectConfigure
     {
         private readonly ConcurrentDictionary<Type, object> optionCache;
 
@@ -13,7 +13,7 @@ namespace AspectCore.Container.DependencyInjection.Test
             optionCache = new ConcurrentDictionary<Type, object>();
         }
 
-        public IConfigurationOption<TOption> GetConfigurationOption<TOption>()
+        public IAspectConfigureOption<TOption> GetConfigureOption<TOption>()
         {
             return (ConfigurationOption<TOption>)optionCache.GetOrAdd(typeof(TOption), key => new ConfigurationOption<TOption>());
         }

@@ -21,7 +21,7 @@ namespace AspectCore.Container.Autofac.Test
         [InlineData(typeof(IAspectActivator))]
         [InlineData(typeof(IAspectBuilderProvider))]
         [InlineData(typeof(IInterceptorSelector))]
-        [InlineData(typeof(IAspectConfiguration))]
+        [InlineData(typeof(IAspectConfigure))]
         [InlineData(typeof(IInterceptorInjectorProvider))]
         [InlineData(typeof(IInterceptorMatcher))]
         [InlineData(typeof(IAspectValidator))]
