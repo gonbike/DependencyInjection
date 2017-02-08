@@ -1,9 +1,8 @@
-﻿using AspectCore.Abstractions;
-using AspectCore.Abstractions.Resolution;
-using AspectCore.Abstractions.Resolution.Internal;
+﻿using System;
+using AspectCore.Abstractions;
+using AspectCore.Abstractions.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using System;
 
 namespace AspectCore.Container.DependencyInjection
 {

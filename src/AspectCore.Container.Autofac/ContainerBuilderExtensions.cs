@@ -1,8 +1,7 @@
-﻿using AspectCore.Abstractions;
-using AspectCore.Abstractions.Resolution;
-using AspectCore.Abstractions.Resolution.Internal;
+﻿using System;
+using AspectCore.Abstractions;
+using AspectCore.Abstractions.Internal;
 using Autofac;
-using System;
 
 namespace AspectCore.Container.Autofac
 {

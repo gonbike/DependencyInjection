@@ -1,14 +1,13 @@
-﻿using AspectCore.Abstractions;
+﻿using System;
+using System.Linq;
+using System.Reflection;
+using AspectCore.Abstractions;
 using AspectCore.Abstractions.Extensions;
-using AspectCore.Abstractions.Resolution.Internal;
 using Autofac;
 using Autofac.Builder;
 using Autofac.Core;
 using Autofac.Core.Activators.Reflection;
 using Autofac.Features.Scanning;
-using System;
-using System.Linq;
-using System.Reflection;
 
 namespace AspectCore.Container.Autofac
 {

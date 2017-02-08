@@ -1,5 +1,5 @@
-﻿using AspectCore.Abstractions.Resolution.Internal;
-using System;
+﻿using System;
+using AspectCore.Abstractions;
 
 namespace AspectCore.Container.Autofac
 {

@@ -1,10 +1,10 @@
-﻿using AspectCore.Abstractions;
+﻿using System;
+using System.Reflection;
+using AspectCore.Abstractions;
 using AspectCore.Abstractions.Extensions;
-using AspectCore.Abstractions.Resolution.Internal;
+using AspectCore.Abstractions.Internal;
 using AspectCore.Container.Test.Fakes;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Reflection;
 using Xunit;
 
 namespace AspectCore.Container.DependencyInjection.Test

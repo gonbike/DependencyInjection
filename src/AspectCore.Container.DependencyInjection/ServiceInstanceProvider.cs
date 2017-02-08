@@ -1,9 +1,9 @@
-﻿using AspectCore.Abstractions.Resolution.Internal;
-using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using AspectCore.Abstractions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AspectCore.Container.DependencyInjection
 {
