@@ -16,11 +16,11 @@
     "releaseNotes": "Interceptor and dynamicProxy support for Microsoft.Extensions.DependencyInjection via AspectCore Framework.",
     "repository": {
       "type": "git",
-      "url": "https://github.com/AspectCore/Container"
+      "url": "https://github.com/AspectCore/DependencyInjection"
     },
     "tags": [ "DynamicProxy", "Aop", "DependencyInjection", "AspectCore" ]
   },
-  "projectUrl": "https://github.com/AspectCore/Container",
+  "projectUrl": "https://github.com/AspectCore/DependencyInjection",
   "title": "AspectCore.Container.DependencyInjection",
   "version": "1.1.0-rc1-13210"
 }
