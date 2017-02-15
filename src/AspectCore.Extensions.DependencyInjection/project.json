@@ -21,6 +21,6 @@
     "tags": [ "DynamicProxy", "Aop", "DependencyInjection", "AspectCore" ]
   },
   "projectUrl": "https://github.com/AspectCore/DependencyInjection",
-  "title": "AspectCore.Container.DependencyInjection",
+  "title": "AspectCore.Extensions.DependencyInjection",
   "version": "1.1.0-rc1-13210"
 }
