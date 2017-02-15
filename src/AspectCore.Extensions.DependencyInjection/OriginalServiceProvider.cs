@@ -1,8 +1,8 @@
-﻿using AspectCore.Abstractions;
+﻿using System;
+using AspectCore.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 
-namespace AspectCore.Container.DependencyInjection
+namespace AspectCore.Extensions.DependencyInjection
 {
     internal sealed class OriginalServiceProvider : IOriginalServiceProvider
     {

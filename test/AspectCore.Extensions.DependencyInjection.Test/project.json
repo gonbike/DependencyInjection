@@ -1,4 +1,4 @@
-﻿{
+{
   "version": "1.0.0-*",
   "buildOptions": {
     "debugType": "portable"
@@ -9,8 +9,9 @@
     "dotnet-test-xunit": "2.2.0-preview2-build1029",
     "System.Reflection": "4.3.0",
     "System.Linq": "4.3.0",
-    "AspectCore.Container.Test.Fakes": "1.0.0-*",
-    "AspectCore.Container.Autofac": "1.1.0-*"
+    "Microsoft.Extensions.DependencyInjection.Specification.Tests": "1.1.0",
+    "AspectCore.Extensions.DependencyInjection.Test.Fakes": "1.0.0-*",
+    "AspectCore.Extensions.DependencyInjection": "1.1.0-*"
   },
   "testRunner": "xunit",
   "frameworks": {

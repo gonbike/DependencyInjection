@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AspectCore.Container.Test.Fakes
+namespace AspectCore.Extensions.Test.Fakes
 {
     public class Service : IService
     {

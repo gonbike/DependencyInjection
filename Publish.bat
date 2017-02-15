@@ -8,8 +8,7 @@ for /R "packages" %%s in (*) do (
     del %%s
 )
 
-dotnet pack src/AspectCore.Container.Autofac --configuration Release --output packages
-dotnet pack src/AspectCore.Container.DependencyInjection --configuration Release --output packages
+dotnet pack src/AspectCore.Extensions.DependencyInjection --configuration Release --output packages
 
 for /R "packages" %%s in (*symbols.nupkg) do (
     del %%s

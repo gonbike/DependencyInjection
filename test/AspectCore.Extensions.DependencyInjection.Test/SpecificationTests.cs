@@ -3,7 +3,7 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using AspectCore.Abstractions;
 
-namespace AspectCore.Container.DependencyInjection.Test
+namespace AspectCore.Extensions.DependencyInjection.Test
 {
     public class SpecificationTests: DependencyInjectionSpecificationTests
     {

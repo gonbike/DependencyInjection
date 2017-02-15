@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Concurrent;
 
-namespace AspectCore.Container.DependencyInjection.Test
+namespace AspectCore.Extensions.DependencyInjection.Test
 {
     public class NonIgnoreAspectConfiguration : IAspectConfigure
     {

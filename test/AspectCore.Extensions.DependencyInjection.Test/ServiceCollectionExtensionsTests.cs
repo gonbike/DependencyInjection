@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace AspectCore.Container.DependencyInjection.Test
+namespace AspectCore.Extensions.DependencyInjection.Test
 {
     public class ServiceCollectionExtensionsTests
     {

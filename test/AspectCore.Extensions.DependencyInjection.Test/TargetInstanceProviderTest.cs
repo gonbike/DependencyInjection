@@ -1,4 +1,4 @@
-﻿using AspectCore.Container.Test.Fakes;
+﻿using AspectCore.Extensions.Test.Fakes;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace AspectCore.Container.DependencyInjection.Test
+namespace AspectCore.Extensions.DependencyInjection.Test
 {
     public class TargetInstanceProviderTest
     {

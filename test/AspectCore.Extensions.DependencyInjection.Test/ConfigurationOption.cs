@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace AspectCore.Container.DependencyInjection.Test
+namespace AspectCore.Extensions.DependencyInjection.Test
 {
     public class ConfigurationOption<TOption> : IAspectConfigureOption<TOption>
     {

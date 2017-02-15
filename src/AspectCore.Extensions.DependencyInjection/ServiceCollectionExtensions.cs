@@ -4,7 +4,7 @@ using AspectCore.Abstractions.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace AspectCore.Container.DependencyInjection
+namespace AspectCore.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
@@ -54,6 +54,11 @@ namespace AspectCore.Container.DependencyInjection
             services.AddSingleton<IAspectConfigure>(aspectConfigure);
 
             return services;
+        }
+
+        public static IServiceProvider BuildAspectCoreServiceProvider(this IServiceCollection services)
+        {
+            return new AspectCoreServiceProviderFactory().CreateServiceProvider(services);
         }
     }
 }

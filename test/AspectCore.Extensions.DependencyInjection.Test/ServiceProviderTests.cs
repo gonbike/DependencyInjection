@@ -1,11 +1,11 @@
 ﻿using AspectCore.Abstractions;
 using AspectCore.Abstractions.Extensions;
-using AspectCore.Container.Test.Fakes;
+using AspectCore.Extensions.Test.Fakes;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using Xunit;
 
-namespace AspectCore.Container.DependencyInjection.Test
+namespace AspectCore.Extensions.DependencyInjection.Test
 {
     public class ServiceProviderTests
     {

@@ -1,16 +1,20 @@
-﻿using AspectCore.Abstractions;
+﻿using System;
+using System.Reflection;
+using AspectCore.Abstractions;
 using AspectCore.Abstractions.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using System;
-using System.Reflection;
 
-namespace AspectCore.Container.DependencyInjection
+namespace AspectCore.Extensions.DependencyInjection
 {
     public class AspectCoreServiceProviderFactory : IServiceProviderFactory<IServiceCollection>
     {
         public IServiceCollection CreateBuilder(IServiceCollection serviceCollection)
         {
+            if (serviceCollection == null)
+            {
+                throw new ArgumentNullException(nameof(serviceCollection));
+            }
             var serviceProvider = serviceCollection.TryAddAspectCore().BuildServiceProvider();
 
             var aspectValidator = serviceProvider.GetRequiredService<IAspectValidator>();
@@ -41,7 +45,7 @@ namespace AspectCore.Container.DependencyInjection
 
             dynamicProxyServices.AddScoped<IOriginalServiceProvider>(p =>
             {
-                var scopedProvider = serviceProvider.GetService<IServiceScopeFactory>().CreateScope().ServiceProvider;
+                var scopedProvider = serviceProvider.CreateScope().ServiceProvider;
                 return new OriginalServiceProvider(scopedProvider);
             });
 
@@ -50,6 +54,10 @@ namespace AspectCore.Container.DependencyInjection
 
         public IServiceProvider CreateServiceProvider(IServiceCollection containerBuilder)
         {
+            if (containerBuilder == null)
+            {
+                throw new ArgumentNullException(nameof(containerBuilder));
+            }
             return CreateBuilder(containerBuilder).BuildServiceProvider();
         }
 
