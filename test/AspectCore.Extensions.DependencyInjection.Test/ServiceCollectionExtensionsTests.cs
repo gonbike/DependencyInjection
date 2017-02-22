@@ -10,7 +10,7 @@ namespace AspectCore.Extensions.DependencyInjection.Test
         public void AddAspectConfiguration_Test()
         {
             var services = new ServiceCollection();
-            services.AddAspectConfigure(c => { });
+            services.ConfigureAspectCore(c => { });
             var aspectCoreServiceProviderFactory = new AspectCoreServiceProviderFactory();
             var proxyServices = aspectCoreServiceProviderFactory.CreateBuilder(services);
             var descriptor = Assert.Single(proxyServices, d => d.ServiceType == typeof(IAspectConfigure));

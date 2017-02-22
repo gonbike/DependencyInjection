@@ -33,11 +33,11 @@ namespace AspectCore.Extensions.DependencyInjection
                 Type proxyType;
                 if (descriptor.ServiceType.GetTypeInfo().IsInterface)
                 {
-                    proxyType = generator.CreateInterfaceProxyType(descriptor.ServiceType, descriptor.ImplementationType);
+                    proxyType = generator.CreateInterfaceProxyType(descriptor.ServiceType, descriptor.ImplementationType, descriptor.ServiceType.GetTypeInfo().GetInterfaces());
                 }
                 else
                 {
-                    proxyType = generator.CreateClassProxyType(descriptor.ServiceType, descriptor.ImplementationType);
+                    proxyType = generator.CreateClassProxyType(descriptor.ServiceType, descriptor.ImplementationType, descriptor.ServiceType.GetTypeInfo().GetInterfaces());
                 }
                 dynamicProxyServices.Add(ServiceDescriptor.Describe(descriptor.ServiceType, proxyType, descriptor.Lifetime));
                 ServiceInstanceProvider.MapServiceDescriptor(descriptor);

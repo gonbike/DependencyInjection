@@ -38,7 +38,7 @@ namespace AspectCore.Extensions.DependencyInjection
             return services;
         }
 
-        public static IServiceCollection AddAspectConfigure(this IServiceCollection services, Action<IAspectConfigure> configure)
+        public static IServiceCollection ConfigureAspectCore(this IServiceCollection services, Action<IAspectConfigure> configure)
         {
             if (services == null)
             {
@@ -50,7 +50,9 @@ namespace AspectCore.Extensions.DependencyInjection
             }
 
             var aspectConfigure = new AspectConfigure();
+
             configure.Invoke(aspectConfigure);
+
             services.AddSingleton<IAspectConfigure>(aspectConfigure);
 
             return services;

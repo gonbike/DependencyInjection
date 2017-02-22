@@ -10,7 +10,6 @@
     "System.Reflection": "4.3.0",
     "System.Linq": "4.3.0",
     "Microsoft.Extensions.DependencyInjection.Specification.Tests": "1.1.0",
-    "AspectCore.Extensions.DependencyInjection.Test.Fakes": "1.0.0-*",
     "AspectCore.Extensions.DependencyInjection": "1.1.0-*"
   },
   "testRunner": "xunit",
