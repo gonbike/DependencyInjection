@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Reflection;
 using AspectCore.Abstractions;
-using AspectCore.Abstractions.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -43,11 +42,7 @@ namespace AspectCore.Extensions.DependencyInjection
                 ServiceInstanceProvider.MapServiceDescriptor(descriptor);
             }
 
-            dynamicProxyServices.AddScoped<IOriginalServiceProvider>(p =>
-            {
-                var scopedProvider = serviceProvider.CreateScope().ServiceProvider;
-                return new OriginalServiceProvider(scopedProvider);
-            });
+            dynamicProxyServices.AddScoped<IRealServiceProvider>(p => new RealServiceProvider(serviceProvider.CreateScope().ServiceProvider));
 
             return dynamicProxyServices;
         }
