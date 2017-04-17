@@ -13,9 +13,9 @@ namespace AspectCore.Extensions.DependencyInjection
 
         private readonly static ConcurrentDictionary<IServiceProvider, ConcurrentDictionary<Type, object>> ScopedResolvedServiceCache = new ConcurrentDictionary<IServiceProvider, ConcurrentDictionary<Type, object>>();
 
-        private readonly IServiceProvider serviceProvider;
+        private readonly IServiceProvider _serviceProvider;
 
-        private readonly object resolveLock = new object();
+        private readonly object _resolveLock = new object();
 
         public ServiceInstanceProvider(IServiceProvider serviceProvider)
         {
@@ -24,7 +24,7 @@ namespace AspectCore.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(serviceProvider));
             }
 
-            this.serviceProvider = serviceProvider;
+            _serviceProvider = serviceProvider;
         }
 
         public object GetInstance(Type serviceType)
@@ -38,7 +38,7 @@ namespace AspectCore.Extensions.DependencyInjection
 
             if (!ServiceDescriptorCache.TryGetValue(serviceType, out descriptorList))
             {
-                return serviceProvider.GetRequiredService(serviceType);
+                return _serviceProvider.GetRequiredService(serviceType);
             }
 
             var descriptor = descriptorList.Last();
@@ -47,22 +47,22 @@ namespace AspectCore.Extensions.DependencyInjection
 
             if (descriptor.Lifetime == ServiceLifetime.Transient)
             {
-                return factory(serviceProvider, descriptor.ImplementationType);
+                return factory(_serviceProvider, descriptor.ImplementationType);
             }
 
             var resolvedServices = GetOrAddResolvedCache();
 
-            return resolvedServices.GetOrAdd(serviceType, _ => factory(serviceProvider, descriptor.ImplementationType));
+            return resolvedServices.GetOrAdd(serviceType, _ => factory(_serviceProvider, descriptor.ImplementationType));
         }
 
         private Func<IServiceProvider, Type, object> GetObjectFactory()
         {
-            return (servicrProvider, type) => ActivatorUtilities.CreateInstance(serviceProvider, type);
+            return (servicrProvider, type) => ActivatorUtilities.CreateInstance(servicrProvider, type);
         }
 
         private ConcurrentDictionary<Type, object> GetOrAddResolvedCache()
         {
-            var resolvedCache = ScopedResolvedServiceCache.GetOrAdd(serviceProvider, _ => new ConcurrentDictionary<Type, object>());
+            var resolvedCache = ScopedResolvedServiceCache.GetOrAdd(_serviceProvider, _ => new ConcurrentDictionary<Type, object>());
             return resolvedCache;
         }
 
@@ -79,7 +79,7 @@ namespace AspectCore.Extensions.DependencyInjection
         public void Dispose()
         {
             ConcurrentDictionary<Type, object> resolvedServices;
-            if (ScopedResolvedServiceCache.TryRemove(serviceProvider, out resolvedServices))
+            if (ScopedResolvedServiceCache.TryRemove(_serviceProvider, out resolvedServices))
             {
                 resolvedServices.Clear();
             }

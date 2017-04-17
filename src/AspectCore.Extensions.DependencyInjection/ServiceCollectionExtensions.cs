@@ -8,7 +8,7 @@ namespace AspectCore.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        internal static IServiceCollection TryAddAspectCore(this IServiceCollection services)
+        public static IServiceCollection AddAspectCore(this IServiceCollection services)
         {
             if (services == null)
             {
@@ -19,26 +19,64 @@ namespace AspectCore.Extensions.DependencyInjection
 
             services.TryAddScoped<IAspectBuilderProvider, AspectBuilderProvider>();
 
-            services.TryAddScoped<IInterceptorSelector, InterceptorSelector>();
+            //services.TryAddScoped<IInterceptorSelector, ConfigureInterceptorSelector>();
 
-            services.TryAddScoped<IInterceptorInjectorProvider, InterceptorInjectorProvider>();
 
-            services.TryAddScoped<IServiceInstanceProvider, ServiceInstanceProvider>();
+            services.AddTransient<IServiceInstanceProvider, ServiceInstanceProvider>();
 
-            services.TryAddSingleton<IPropertyInjectorSelector, PropertyInjectorSelector>();
+            //services.TryAddSingleton<IInterceptorMatcher, InterceptorMatcher>();
 
-            services.TryAddSingleton<IInterceptorMatcher, InterceptorMatcher>();
+            //services.TryAddSingleton<IAspectConfigure, AspectConfigure>();
 
-            services.TryAddSingleton<IAspectConfigure, AspectConfigure>();
+            //services.TryAddSingleton<IAspectValidator, AspectValidator>();
 
-            services.TryAddSingleton<IAspectValidator, AspectValidator>();
+            services.TryAddSingleton<IProxyGenerator, ProxyGenerator>();
 
-            services.TryAddSingleton<IProxyGenerator, ProxyGenerator>();  
-               
             return services;
         }
 
-        public static IServiceCollection ConfigureAspectCore(this IServiceCollection services, Action<IAspectConfigure> configure)
+        internal static IServiceCollection AddInterceptorProvider(this IServiceCollection services)
+        {
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            services.AddTransient<IInterceptorProvider, InterceptorProvider>();
+            services.AddTransient<IInterceptorSelector, ConfigureInterceptorSelector>();
+            services.AddTransient<IInterceptorSelector, TypeInterceptorSelector>();
+            services.AddTransient<IInterceptorSelector, MethodInterceptorSelector>();
+
+            return services;
+        }
+
+        internal static IServiceCollection AddInterceptorActivator(this IServiceCollection services)
+        {
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            services.AddTransient<ITypedInterceptorActivator, ReflectionTypedInterceptorActivator>();
+            services.AddTransient<ITypedInterceptorActivator, ActivatorUtilitieInterceptorActivator>();
+
+            return services;
+        }
+
+        internal static IServiceCollection AddInterceptorInjector(this IServiceCollection services)
+        {
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            services.AddTransient<IInterceptorInjectorProvider, InterceptorInjectorProvider>();
+            services.AddTransient<IPropertyInjectorSelector, PropertyInjectorSelector>();
+
+            return services;
+        }
+
+        internal static IServiceCollection ConfigureAspectCore(this IServiceCollection services, Action<IAspectConfigure> configure)
         {
             if (services == null)
             {

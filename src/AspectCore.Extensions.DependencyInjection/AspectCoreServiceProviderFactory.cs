@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using AspectCore.Abstractions;
+using AspectCore.Core.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -14,13 +15,13 @@ namespace AspectCore.Extensions.DependencyInjection
             {
                 throw new ArgumentNullException(nameof(serviceCollection));
             }
-            var serviceProvider = serviceCollection.TryAddAspectCore().BuildServiceProvider();
+            var serviceProvider = serviceCollection.BuildServiceProvider();
 
-            var aspectValidator = serviceProvider.GetRequiredService<IAspectValidator>();
+            var aspectValidator = serviceProvider.GetRequiredService<IAspectValidatorBuilder>().Build();
 
             var dynamicProxyServices = new ServiceCollection();
 
-            var generator = serviceProvider.GetService<IProxyGenerator>();
+            var generator = serviceProvider.GetRequiredService<IProxyGenerator>();
 
             foreach (var descriptor in serviceCollection)
             {
@@ -64,12 +65,12 @@ namespace AspectCore.Extensions.DependencyInjection
                 return false;
             }
 
-            if (!aspectValidator.Validate(descriptor.ServiceType))
+            if (!aspectValidator.Validate(descriptor.ServiceType.GetTypeInfo()))
             {
                 return false;
             }
 
-            if (implementationType.GetTypeInfo().IsDynamically())
+            if (implementationType.GetTypeInfo().IsDefined(typeof(DynamicallyAttribute)))
             {
                 return false;
             }
