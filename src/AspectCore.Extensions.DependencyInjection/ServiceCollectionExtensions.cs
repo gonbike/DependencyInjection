@@ -42,10 +42,10 @@ namespace AspectCore.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(services));
             }
 
-            services.AddTransient<IInterceptorProvider, InterceptorProvider>();
-            services.AddTransient<IInterceptorSelector, ConfigureInterceptorSelector>();
-            services.AddTransient<IInterceptorSelector, TypeInterceptorSelector>();
-            services.AddTransient<IInterceptorSelector, MethodInterceptorSelector>();
+            services.TryAddScoped<IInterceptorProvider, InterceptorProvider>();
+            services.TryAddScoped<IInterceptorSelector, ConfigureInterceptorSelector>();
+            services.TryAddScoped<IInterceptorSelector, TypeInterceptorSelector>();
+            services.TryAddScoped<IInterceptorSelector, MethodInterceptorSelector>();
 
             return services;
         }
@@ -57,8 +57,8 @@ namespace AspectCore.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(services));
             }
 
-            services.AddTransient<ITypedInterceptorActivator, ReflectionTypedInterceptorActivator>();
-            services.AddTransient<ITypedInterceptorActivator, ActivatorUtilitieInterceptorActivator>();
+            services.TryAddScoped<ITypedInterceptorActivator, ReflectionTypedInterceptorActivator>();
+            services.TryAddScoped<ITypedInterceptorActivator, ActivatorUtilitieInterceptorActivator>();
 
             return services;
         }
@@ -70,8 +70,8 @@ namespace AspectCore.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(services));
             }
 
-            services.AddTransient<IInterceptorInjectorProvider, InterceptorInjectorProvider>();
-            services.AddTransient<IPropertyInjectorSelector, PropertyInjectorSelector>();
+            services.TryAddScoped<IInterceptorInjectorProvider, InterceptorInjectorProvider>();
+            services.TryAddScoped<IPropertyInjectorSelector, PropertyInjectorSelector>();
 
             return services;
         }
