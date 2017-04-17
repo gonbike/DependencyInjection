@@ -47,6 +47,8 @@ namespace AspectCore.Extensions.DependencyInjection
 
             services.AddScoped<IProxyGenerator, ProxyGenerator>();
 
+            services.AddScoped<IRealServiceProvider>(p => new RealServiceProvider(p));
+
             return services;
         }
 
