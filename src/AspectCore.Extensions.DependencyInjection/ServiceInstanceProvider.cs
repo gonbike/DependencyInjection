@@ -43,16 +43,29 @@ namespace AspectCore.Extensions.DependencyInjection
 
             var descriptor = descriptorList.Last();
 
-            var factory = GetObjectFactory();
+            if (descriptor.ImplementationInstance != null)
+            {
+                return descriptor.ImplementationInstance;
+            }
 
             if (descriptor.Lifetime == ServiceLifetime.Transient)
             {
-                return factory(_serviceProvider, descriptor.ImplementationType);
+                if (descriptor.ImplementationFactory != null)
+                {
+                    return descriptor.ImplementationFactory(_serviceProvider);
+                }
+
+                return GetObjectFactory()(_serviceProvider, descriptor.ImplementationType);
             }
 
             var resolvedServices = GetOrAddResolvedCache();
 
-            return resolvedServices.GetOrAdd(serviceType, _ => factory(_serviceProvider, descriptor.ImplementationType));
+            if (descriptor.ImplementationFactory != null)
+            {
+                return resolvedServices.GetOrAdd(serviceType, _ => descriptor.ImplementationFactory(_serviceProvider));
+            }
+
+            return resolvedServices.GetOrAdd(serviceType, _ => GetObjectFactory()(_serviceProvider, descriptor.ImplementationType));
         }
 
         private Func<IServiceProvider, Type, object> GetObjectFactory()
@@ -73,6 +86,16 @@ namespace AspectCore.Extensions.DependencyInjection
             if (descriptor.ImplementationType != null)
             {
                 descriptorList.Add(ServiceDescriptor.Describe(descriptor.ServiceType, descriptor.ImplementationType, descriptor.Lifetime));
+            }
+
+            if (descriptor.ImplementationInstance != null)
+            {
+                descriptorList.Add(new ServiceDescriptor(descriptor.ServiceType, descriptor.ImplementationInstance));
+            }
+
+            if (descriptor.ImplementationFactory != null)
+            {
+                descriptorList.Add(ServiceDescriptor.Describe(descriptor.ServiceType, descriptor.ImplementationFactory, descriptor.Lifetime));
             }
         }
 

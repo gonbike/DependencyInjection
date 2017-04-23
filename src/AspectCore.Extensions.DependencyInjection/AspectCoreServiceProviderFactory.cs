@@ -9,6 +9,11 @@ namespace AspectCore.Extensions.DependencyInjection
 {
     public class AspectCoreServiceProviderFactory : IServiceProviderFactory<IServiceCollection>
     {
+
+        private readonly static MethodInfo GetImplementationType = typeof(ServiceDescriptor).GetTypeInfo().GetMethod("GetImplementationType", BindingFlags.Instance | BindingFlags.NonPublic);
+
+        private readonly static MethodAccessor GetImplementationTypeAccessor = new MethodAccessor(GetImplementationType);
+
         public IServiceCollection CreateBuilder(IServiceCollection serviceCollection)
         {
             if (serviceCollection == null)
@@ -25,19 +30,20 @@ namespace AspectCore.Extensions.DependencyInjection
 
             foreach (var descriptor in serviceCollection)
             {
-                if (!Validate(descriptor, aspectValidator))
+                Type proxyType, implementationType;
+                if (!Validate(descriptor, aspectValidator, out implementationType))
                 {
                     dynamicProxyServices.Add(descriptor);
                     continue;
                 }
-                Type proxyType;
+
                 if (descriptor.ServiceType.GetTypeInfo().IsInterface)
                 {
-                    proxyType = generator.CreateInterfaceProxyType(descriptor.ServiceType, descriptor.ImplementationType, descriptor.ServiceType.GetTypeInfo().GetInterfaces());
+                    proxyType = generator.CreateInterfaceProxyType(descriptor.ServiceType, implementationType, descriptor.ServiceType.GetTypeInfo().GetInterfaces());
                 }
                 else
                 {
-                    proxyType = generator.CreateClassProxyType(descriptor.ServiceType, descriptor.ImplementationType, descriptor.ServiceType.GetTypeInfo().GetInterfaces());
+                    proxyType = generator.CreateClassProxyType(descriptor.ServiceType, implementationType, descriptor.ServiceType.GetTypeInfo().GetInterfaces());
                 }
                 dynamicProxyServices.Add(ServiceDescriptor.Describe(descriptor.ServiceType, proxyType, descriptor.Lifetime));
                 ServiceInstanceProvider.MapServiceDescriptor(descriptor);
@@ -57,25 +63,36 @@ namespace AspectCore.Extensions.DependencyInjection
             return CreateBuilder(containerBuilder).BuildServiceProvider();
         }
 
-        private static bool Validate(ServiceDescriptor descriptor, IAspectValidator aspectValidator)
+
+        private static bool Validate(ServiceDescriptor descriptor, IAspectValidator aspectValidator, out Type implementationType)
         {
-            var implementationType = descriptor.ImplementationType;
-            if (implementationType == null)
-            {
-                return false;
-            }
+            implementationType = null;
 
             if (!aspectValidator.Validate(descriptor.ServiceType.GetTypeInfo()))
             {
                 return false;
             }
 
-            if (implementationType.GetTypeInfo().IsDefined(typeof(DynamicallyAttribute)))
+            if (descriptor.ServiceType.GetTypeInfo().IsClass)
+            {
+                if (descriptor.ImplementationType == null)
+                {
+                    return false;
+                }
+                if (!descriptor.ImplementationType.GetTypeInfo().CanInherited())
+                {
+                    return false;
+                }
+            }
+
+            implementationType = (Type)GetImplementationTypeAccessor.CreateMethodInvoker()(descriptor, new object[0]);
+
+            if (implementationType == null)
             {
                 return false;
             }
 
-            if (!implementationType.GetTypeInfo().CanInherited())
+            if (implementationType.GetTypeInfo().IsDefined(typeof(DynamicallyAttribute)))
             {
                 return false;
             }

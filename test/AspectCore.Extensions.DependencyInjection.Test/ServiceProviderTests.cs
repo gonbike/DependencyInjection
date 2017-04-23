@@ -62,7 +62,7 @@ namespace AspectCore.Extensions.DependencyInjection.Test
             var aspectCoreServiceProviderFactory = new AspectCoreServiceProviderFactory();
             var proxyServiceProvider = aspectCoreServiceProviderFactory.CreateServiceProvider(services);
             var originalServiceProvider = proxyServiceProvider.GetService<IRealServiceProvider>();
- 
+
             var proxyService = originalServiceProvider.GetService<IService>();
 
             Assert.False(proxyService.GetType().GetTypeInfo().IsDefined(typeof(DynamicallyAttribute)));
@@ -99,6 +99,30 @@ namespace AspectCore.Extensions.DependencyInjection.Test
             }
             var proxyService = proxyServiceProvider.GetService<IService>();
             Assert.Equal(proxyService.Get(1), proxyService.Get(1));
+        }
+
+        [Fact]
+        public void ServiceProvider_ImplementationInstance_Test()
+        {
+            var services = new ServiceCollection();
+            services.AddAspectCore();
+            services.AddSingleton<IService>(new Service());
+            var aspectCoreServiceProviderFactory = new AspectCoreServiceProviderFactory();
+            var proxyServiceProvider = aspectCoreServiceProviderFactory.CreateServiceProvider(services);
+            var proxyService = proxyServiceProvider.GetService<IService>();
+            Assert.True(proxyService.GetType().GetTypeInfo().IsDefined(typeof(DynamicallyAttribute)));
+        }
+
+        [Fact]
+        public void ServiceProvider_ImplementationFactory_Test()
+        {
+            var services = new ServiceCollection();
+            services.AddAspectCore();
+            services.AddSingleton<IService>(s => new Service());
+            var aspectCoreServiceProviderFactory = new AspectCoreServiceProviderFactory();
+            var proxyServiceProvider = aspectCoreServiceProviderFactory.CreateServiceProvider(services);
+            var proxyService = proxyServiceProvider.GetService<IService>();
+            Assert.True(proxyService.GetType().GetTypeInfo().IsDefined(typeof(DynamicallyAttribute)));
         }
     }
 }

@@ -38,16 +38,15 @@ namespace AspectCore.Extensions.DependencyInjection
             {
                 throw new ArgumentNullException(nameof(services));
             }
+            services.AddTransient<IAspectActivator, AspectActivator>();
 
-            services.AddScoped<IAspectActivator, AspectActivator>();
+            services.AddTransient<IAspectBuilderProvider, AspectBuilderProvider>();
 
-            services.AddScoped<IAspectBuilderProvider, AspectBuilderProvider>();
+            services.AddTransient<IServiceInstanceProvider, ServiceInstanceProvider>();
 
-            services.AddScoped<IServiceInstanceProvider, ServiceInstanceProvider>();
+            services.AddTransient<IProxyGenerator, ProxyGenerator>();
 
-            services.AddScoped<IProxyGenerator, ProxyGenerator>();
-
-            services.AddScoped<IRealServiceProvider>(p => new RealServiceProvider(p));
+            services.AddTransient<IRealServiceProvider>(p => new RealServiceProvider(p));
 
             return services;
         }
@@ -93,10 +92,10 @@ namespace AspectCore.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(services));
             }
 
-            services.AddScoped<IInterceptorProvider, InterceptorProvider>();
-            services.AddScoped<IInterceptorSelector, ConfigureInterceptorSelector>();
-            services.AddScoped<IInterceptorSelector, TypeInterceptorSelector>();
-            services.AddScoped<IInterceptorSelector, MethodInterceptorSelector>();
+            services.AddTransient<IInterceptorProvider, InterceptorProvider>();
+            services.AddTransient<IInterceptorSelector, ConfigureInterceptorSelector>();
+            services.AddTransient<IInterceptorSelector, TypeInterceptorSelector>();
+            services.AddTransient<IInterceptorSelector, MethodInterceptorSelector>();
 
             return services;
         }
@@ -108,8 +107,8 @@ namespace AspectCore.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(services));
             }
 
-            services.AddScoped<ITypedInterceptorActivator, ReflectionTypedInterceptorActivator>();
-            services.AddScoped<ITypedInterceptorActivator, ActivatorUtilitieInterceptorActivator>();
+            services.AddTransient<ITypedInterceptorActivator, ReflectionTypedInterceptorActivator>();
+            services.AddTransient<ITypedInterceptorActivator, ActivatorUtilitieInterceptorActivator>();
 
             return services;
         }
@@ -121,8 +120,8 @@ namespace AspectCore.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(services));
             }
 
-            services.AddScoped<IInterceptorInjectorProvider, InterceptorInjectorProvider>();
-            services.AddScoped<IPropertyInjectorSelector, PropertyInjectorSelector>();
+            services.AddTransient<IInterceptorInjectorProvider, InterceptorInjectorProvider>();
+            services.AddTransient<IPropertyInjectorSelector, PropertyInjectorSelector>();
 
             return services;
         }
