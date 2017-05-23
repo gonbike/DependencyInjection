@@ -1,7 +1,7 @@
 {
   "authors": [ "Lemon" ],
   "dependencies": {
-    "AspectCore.Core": "0.1.0.4",
+    "AspectCore.Core": "0.1.1",
     "Microsoft.Extensions.DependencyInjection": "1.1.0"
   },
   "description": "Interceptor and dynamicProxy support for Microsoft.Extensions.DependencyInjection via AspectCore Framework.",
@@ -22,5 +22,5 @@
   },
   "projectUrl": "https://github.com/AspectCore/DependencyInjection",
   "title": "AspectCore.Extensions.DependencyInjection",
-  "version": "0.1.0.4"
+  "version": "0.1.1"
 }
